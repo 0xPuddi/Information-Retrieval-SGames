@@ -8,12 +8,11 @@
 \usepackage{amsmath}
 \usepackage[
     a4paper,
-    left=2.5cm,
-    right=2.5cm,
-    top=2cm,
-    bottom=2cm
+    left=2cm,
+    right=2cm,
+    top=1cm,
+    bottom=1cm
 ]{geometry}
-
 
 % Page layout
 \geometry{margin=1in}
@@ -29,7 +28,7 @@
 \maketitle
 
 \noindent
-You can find the implementation of the project along the technical guide at my Github repository: \href{https://github.com/0xPuddi/Information-Retrieval-SGames}{Information-Retrieval-SGames}.
+You can find the implementation of the project along with the technical guide at my GitHub repository: \href{https://github.com/0xPuddi/Information-Retrieval-SGames}{Information-Retrieval-SGames}.
 I started by setting up the project using uv.
 
 % \begin{abstract}
@@ -46,19 +45,19 @@ I started by setting up the project using uv.
 \section{Scraper}
 
 I started by creating a scraper with the aim to collect websites data that will be used as documents for my collection.
-The first platform I scraped is \href{https://itch.io/}{itchio}, which provides a pletora of indie games, ranging from games made in few minutes to games that become small hits.
-Going to the website I decided to look for the scraping policies, provided by the \textit{robots.txt} file.
+The first platform I scraped is \href{https://itch.io/}{itchio}, which provides a plethora of indie games, ranging from games made in a few minutes to games that become small hits.
+Going to the website, I decided to look for the scraping policies provided by the \textit{robots.txt} file.
 % Policies allow majority of pages and any user agent. Moreover, there is a link to a sitemap. The sitemap provides an \textit{XML} file detailing all existing pages by category.
-Seeing the sitemap in the \textit{robots.txt} I decided to scrape the website a little differently, instead of going through the main page (root page) and traversing it through links on the home page I opted to go for the sitemap, collecting all games URLs and hitting each one with a \textit{GET} request to obtain, parse and save the content.
+Seeing the sitemap in the \textit{robots.txt} I decided to scrape the website a little differently, instead of going through the main page (root page) and traversing it through links on the homepage I opted to go with the sitemap, collecting all games' URLs and hitting each one with a \textit{GET} request to obtain, parse, and save the content.
 % The sitemap provides links for games pages where each one holds a great amount of links directing to games pages. We collect those links by looking whether the link has the sequence \textit{game} or \textit{game\_*}, where the asteric can be any sequence of numbers characters ($[0, 9]$) of any length.
 % Once obtained, we send a \textit{GET} request to obtain the page, which returns a list of links that redirect to games pages. We simply iterate over those and collect data for each one of them.
 
-To complete the project I plan to add \href{https://store.steampowered.com/}{steam} and \href{https://gamejolt.com/games}{gamejolt} scrapers and explain better and in more detail the scraper and completely cite sources that I used in the report (if I do so I will exceed 1 page).
+To complete the project I plan to add \href{https://store.steampowered.com/}{Steam} and \href{https://gamejolt.com/games}{Gamejolt} scrapers and explain in more detail the scraper and completely cite sources that I used in the report (if I do so I will exceed 1 page).
 
 \section{Search Engine}
 
 As soon as I got my first scraper running and collected some data I moved on to building the basis of my Search Engine.
-The Search engine for npw has two components: A retrieval model and a web server. Both are developed using python, where the retrieval model is made with simple libraries and a DuckDB database to hold the inverted index.
+The Search engine for now has two components: A retrieval model and a web server. Both are developed using Python, where the retrieval model is made with simple libraries and a DuckDB database to hold the inverted index.
 The web server is also made in pyhton with Flask, which provides any kind of route and HTML templates.
 % We define the website through HTML pages and templates and CSS for styles.
 
@@ -66,25 +65,28 @@ The Search engine architecture is established, for the end of the project I migh
 
 \subsection{Retrieval Model}
 
-The retrieval mdoel is the most interesting part of the Search Engine.
-I started by creeating a \textit{Parser} object which holds all text processing tasks.
+The retrieval model is the most interesting part of the Search Engine.
+% I started by creeating a \textit{Parser} object which holds all text processing tasks.
 At this time it provides a tokenizer, stopwords removal and stemming.
-To implement those features I leveraged a the simple \href{https://www.geeksforgeeks.org/python/NLTK-NLP/}{nltk} NLP processing library to remove stopwords and to stem tokens.
-Then I created the \textit{Indexer}, which is responsible of reading the collection from the \textit{/collection} folder, build the inverted index and store it in the \href{https://duckdb.org/docs/stable/clients/python/overview}{DuckDB} database.
-Briefly I count different frequencies, then build the inverted index with lexicon, postings and a middle table to properly compute the Okapi BM25 provided by the \href{https://en.wikipedia.org/wiki/Okapi_BM25}{wikipedia reference}.
+To implement those features I leveraged the simple \href{https://www.geeksforgeeks.org/python/NLTK-NLP/}{nltk} NLP processing library to remove stopwords and to stem tokens.
+Then I created the \textit{Indexer}, which is responsible for reading the collection from the \textit{/collection} folder, build the inverted index and store it in the \href{https://duckdb.org/docs/stable/clients/python/overview}{DuckDB} database.
+Briefly, I count different frequencies, then build the inverted index with lexicon, postings and a middle table to properly compute the Okapi BM25 provided by the \href{https://en.wikipedia.org/wiki/Okapi_BM25}{wikipedia reference}.
 % BM25 computatio is done in the \textit{BM25} object in the \textit{BM25.py} file. The Object relies on the \textit{Indexer} to get frequencies informations.
 
-At the moment we can build and retrieve documents. Yet, building the indexer is not very efficient and the precision of the current algorithm is questionable.
+At the moment, we can build and retrieve documents.
+Yet, building the indexer is not very efficient and the precision of the current algorithm is questionable.
 To complete the project I plan to modify both the \textit{Indexer} and the \textit{BM25} algorithm to address those two issues.
 
 \subsection{Web Server}
 
 The web server is simple and the most underdeveloped component at this time.
-I provide two routes: an home page at \textit{/} and a query route at \textit{/query} that takes a JSON body with a \textit{query} field, which is the query to match, and a \textit{documents} field, which is the amount of documents to be returned.
+I provide two routes: a home page at \textit{/} and a query route at \textit{/query} that takes a JSON body with a \textit{query} field, which is the query to be matched.
 % The pages are simple, I define an \textit{index.html} that is the homepage and a component: \textit{card.html} which is responsible for displaying the preview of the returned documents.
 
-I plant to expand the web server by making the Homepage clear and provided with at least a simple feature.
-Then I will also give each document a dedicated page entry displaying its information. Here too I will cite soruces and explain it in greater detail.
+I plan to expand the web server by making the Homepage clear and provided with at least a simple feature.
+Introduce questionnaires to get feedback both before using the engine and after, along with examples queries that users can make to evaluate the system.
+% Then I will also give each document a dedicated page entry displaying its information with much greater detail.
+Here too I will cite sources and explain it in greater detail.
 
 % \section{Conclusion}
 %

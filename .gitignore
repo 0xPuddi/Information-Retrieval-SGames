@@ -1,0 +1,40 @@
+# python files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# virtual environments
+.venv
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
+*.lof
+*.lot
+*.bcf
+*.run.xml
+*.xdv
+report.pdf
+
+# environment Variables
+.env
+
+# collection data and database
+**/db/*
+**/collection/**/*.json
+
+# others
+.DS_Store

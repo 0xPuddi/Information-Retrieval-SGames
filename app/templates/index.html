@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>My App</title>
+
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='style.css') }}"
+		/>
+
+		<script>
+			async function search(event) {
+				if (event.key === 'Enter') {
+					console.log('enter');
+					const query = document.getElementById('search-input').value;
+					if (!query) return;
+
+					try {
+						console.log('headers correct');
+						const response = await fetch('/query', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({ query }),
+						});
+
+						if (!response.ok) throw new Error('API error');
+
+						const html = await response.text();
+
+						// replace container content
+						const container =
+							document.getElementById('items-container');
+						container.innerHTML = html;
+					} catch (err) {
+						console.error(err);
+						alert('Error fetching data.');
+					}
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<h1>Items List</h1>
+
+		<!-- centered input field -->
+		<div style="text-align: center; margin-bottom: 20px">
+			<input
+				id="search-input"
+				type="text"
+				placeholder="Search..."
+				style="width: 50%; padding: 10px; font-size: 16px"
+				onkeypress="search(event)"
+			/>
+		</div>
+
+		<!-- container for cards -->
+		<div class="container-wrapper">
+			<div id="items-container" class="container"></div>
+		</div>
+	</body>
+</html>

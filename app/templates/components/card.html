@@ -1,0 +1,7 @@
+{% for d in documents %}
+<div class="card">
+	<h3 class="card-title">{{ d.metadata.title }}</h3>
+	<p class="card-description">{{ d.metadata.author }}</p>
+	<a class="card-description" href="{{ d.source.url }}">goto</a>
+</div>
+{% endfor %}

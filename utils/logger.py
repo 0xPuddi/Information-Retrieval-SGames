@@ -8,7 +8,13 @@ class Logger:
     GREEN = "\033[92m"
     RESET = "\033[0m"
 
+    LOG_FILE = "./utils/out.log"
+
     def __init__(self):
+        # overwrite log file
+        with open(self.LOG_FILE, "w") as f:
+            f.write("")
+
         self.tags = ["INFO", "WARN", "ERROR", "OK"]
         self.tag_width = max(len(tag) for tag in self.tags)
 
@@ -22,9 +28,14 @@ class Logger:
         self.ts_width = len(self._timestamp())
 
     def _color(self, tag: str, color: str) -> str:
-        stripped = tag
-        padded = stripped.ljust(self.tag_width + 2)
-        return f"{color}{padded}{self.RESET}"
+        # inside tag
+        inner = tag[1:-1]
+        # color
+        colored_inner = f"{color}{inner}{self.RESET}"
+        result = f"[{colored_inner}]"
+        # pad
+        padding_needed = self.tag_width + 2 - len(inner) - 2
+        return result + " " * padding_needed
 
     def _timestamp(self) -> str:
         return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -33,7 +44,14 @@ class Logger:
         ts = self._timestamp()
         padded_ts = ts.ljust(self.ts_width)
 
+        # with colors
         print(f"{self.colored_tags[tag]} {padded_ts} - {message}")
+
+        # without colors
+        line = f"[{tag}]".ljust(self.tag_width + 2) + \
+            f" {padded_ts} - {message}"
+        with open(self.LOG_FILE, "a") as f:
+            f.write(line + "\n")
 
     def info(self, message: str):
         self._log("INFO", message)

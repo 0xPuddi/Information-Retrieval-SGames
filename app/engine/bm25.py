@@ -63,7 +63,8 @@ class BM25():
             collection: list[Document] = self.indexer.read_collection_by_name(
                 coll_name)
             for i, indx in enumerate(indexes):
-                documents[i] = collection[indx[0][1]]
+                if indx[0][1] < len(collection):
+                    documents[i] = collection[indx[0][1]]
         LOGGER.ok("Documents loaded from disk")
         return documents
 
@@ -82,7 +83,6 @@ class BM25():
         - At the end all documents that have query words have been fetched and scored
         - We keep top x results
         """
-        LOGGER.info("Computing query request...")
         # compute documents score
         # dictionary is (collection_name, index) -> score
         LOGGER.info("Computing words scores...")

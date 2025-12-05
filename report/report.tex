@@ -54,6 +54,18 @@ Seeing the sitemap in the \textit{robots.txt} I decided to scrape the website a 
 
 To complete the project I plan to add \href{https://store.steampowered.com/}{Steam} and \href{https://gamejolt.com/games}{Gamejolt} scrapers and explain in more detail the scraper and completely cite sources that I used in the report (if I do so I will exceed 1 page).
 
+% Talk about decisiona bout steam: too much going on -> chose to traverse using recommended
+
+% Talk about at first I implemented scrolling traversal on gamejolt + I could not load the page because i was blocked by cloudflare
+% talk about solutions -> using playwright stealt + headful browser, and startign in the main page, to then traverse to games and get cookies after accepting form
+% once collected you can open new pages to then scrape each game as you wish
+% tell how i changed from a srollin traversal aslo to a recommended traversal for gamejolt -> less moving parts, more reliable
+% say that is it very hard to come to a nroamlized structure between different sources
+% also within the same source there are many different cases in which things are displayied in the html
+% hard to distinguish data types when they are similar category/genre
+% quite difficult to make it efficient: talk about architecture and what it could be improved
+% talk about advantages/disadvantages of collection data by moving between suggested -> very high rate of already seen titles, no control over collected elements and moving the scraper between collections and scrolling -> follows the entire catalouge but it is hardder to program and to make sure it always works "feels clunky"
+
 \section{Search Engine}
 
 As soon as I got my first scraper running and collected some data I moved on to building the basis of my Search Engine.

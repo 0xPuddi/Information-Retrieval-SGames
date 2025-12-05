@@ -11,6 +11,7 @@ from parsel import Selector
 
 from scraper.sources.source import SourceWebsite
 from collection.models.document import Metadata
+from utils.logger import LOGGER
 
 
 class SourceItch(SourceWebsite):
@@ -18,8 +19,9 @@ class SourceItch(SourceWebsite):
     browser: Browser = None
 
     # skip until this one game url is found and start fron the next one
-    last_seen = "https://blade.itch.io/jumpy-human"
+    last_seen = "https://kingbobski.itch.io/flappy-man"
 
+    # Set a limit on number of entries fetched
     limit = False
     times = 2
 
@@ -103,7 +105,7 @@ class SourceItch(SourceWebsite):
                 elif key == "platforms":
                     platforms = [v for v in values if v != ","]
                 elif key in ("category"):
-                    category = [v for v in values if v != ","]
+                    category = ' '.join(values)
                 elif key == "published":
                     published = [v for v in values if v != ","]
                 elif key == "author":
@@ -121,7 +123,9 @@ class SourceItch(SourceWebsite):
                 for t in el.xpath(".//text()").getall()
                 if t.strip()
             ]
-            text = " ".join(text_nodes)
+            desc_text = Selector(text=description_html).xpath(
+                "string()").get().strip()
+            text = (" ".join(text_nodes) + desc_text).strip()
 
             return Metadata(
                 title=title.strip(),
@@ -142,13 +146,13 @@ class SourceItch(SourceWebsite):
             )
 
         except Exception as e:
-            print(
-                f"[scrape_metadata_from_response] Error parsing metadata: {e}")
+            LOGGER.error(
+                f"[SourceItch.scrape_metadata_from_response] Error parsing metadata: {e}")
             return None
 
     async def parse_sitemap(self):
         try:
-            response: Response = self.client.get(self.stiemap_url)
+            response: Response = self.client.get(self.sitemap_url)
             response.raise_for_status()
 
             # get XML root and load namespace
@@ -175,7 +179,8 @@ class SourceItch(SourceWebsite):
                 await sleep(10)
                 await self.parse_game_urls_page(page_url)
         except Exception as e:
-            print(f"[parse_sitemap] Failed to parse sitemap: {e}")
+            LOGGER.error(
+                f"[SourceItch.parse_sitemap] Failed to parse sitemap: {e}")
 
     async def parse_game_urls_page(self, url: str):
         try:
@@ -199,19 +204,22 @@ class SourceItch(SourceWebsite):
                     else:
                         self.times -= 1
 
-                if not found and game_url != self.last_seen:
-                    print(f"[parse_game_urls_page] skipping game: {game_url}")
-                    continue
-                elif not found and game_url == self.last_seen:
-                    found = True
-                    continue
+                if self.last_seen:
+                    if not found and game_url != self.last_seen:
+                        LOGGER.warn(
+                            f"[SourceItch.parse_game_urls_page] skipping game: {game_url}")
+                        continue
+                    elif not found and game_url == self.last_seen:
+                        found = True
+                        continue
 
                 # behave
                 await sleep(1.5)
                 await self.parse_game_page(game_url)
 
         except Exception as e:
-            print(f"[parse_game_urls_page] Failed to parse XML page: {e}")
+            LOGGER.error(
+                f"[SourceItch.parse_game_urls_page] Failed to parse XML page: {e}")
 
     async def parse_game_page(self, url: str):
         try:
@@ -240,15 +248,16 @@ class SourceItch(SourceWebsite):
                     collection_name=self.COLLECTION_NAME
                 )
             else:
-                print(
-                    f"[parse_game_page] Skipped game due to missing metadata: {url}")
+                LOGGER.warn(
+                    f"[SourceItch.parse_game_page] Skipped game due to missing metadata: {url}")
         except Exception as e:
-            print(f"[parse_game_page] Failed: {e}")
+            LOGGER.error(f"[SourceItch.parse_game_page] Failed: {e}")
 
     async def scrape_documents(self):
         if not self.sitemap:
-            print("[start_requests] Expected sitemap URL")
+            LOGGER.error("[SourceItch.start_requests] Expected sitemap URL")
             return
         async with async_playwright() as p:
             self.browser = await p.chromium.launch(headless=True)
             await self.parse_sitemap()
+            await self.browser.close()

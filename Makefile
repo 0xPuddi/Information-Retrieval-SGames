@@ -1,7 +1,7 @@
 run:
 	uv run app
 
-scraper:
+scrapers:
 	uv run scraper
 
 tex:

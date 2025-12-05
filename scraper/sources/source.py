@@ -9,6 +9,8 @@ from collection.models.document import Document, Metadata, Source
 
 import random
 
+from utils.logger import LOGGER
+
 
 class SourceWebsite(ABC):
     # required
@@ -20,8 +22,8 @@ class SourceWebsite(ABC):
     warmed: bool = False
     disallow_paths: list[str] = []
 
-    stiemap: bool = False
-    stiemap_url: str
+    sitemap: bool = False
+    sitemap_url: str
 
     USER_AGENTS = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
@@ -61,6 +63,8 @@ class SourceWebsite(ABC):
             'DNT': '1',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
+            'locale': "en-US",
+            'timezone_id': "Europe/Zurich",
         }
 
     # rotate proxies
@@ -95,7 +99,7 @@ class SourceWebsite(ABC):
                 return proxy
 
         except Exception as e:
-            print(f"[get_proxy] Failed to fetch proxy: {e}")
+            LOGGER.warn(f"[get_proxy] Failed to fetch proxy: {e}")
             return None
 
     def parse_robots_txt(self) -> bool:
@@ -118,7 +122,7 @@ class SourceWebsite(ABC):
                     path = line[len(prefix):].strip()
                     if path:
                         self.sitemap = True
-                        self.stiemap_url = path
+                        self.sitemap_url = path
 
                 prefix = "Disallow:"
                 if line.startswith(prefix):
@@ -177,10 +181,10 @@ class SourceWebsite(ABC):
             data.append(document.model_dump(mode="json"))
             with open(collection_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
-            print(
+            LOGGER.ok(
                 f"[save_metadata_to_collection] Added document '{metadata.title}' to {collection_file}")
         else:
-            print(
+            LOGGER.warn(
                 f"[save_metadata_to_collection] Document '{metadata.title}' already exists in {collection_file}")
 
     @abstractmethod

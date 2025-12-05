@@ -27,6 +27,8 @@ wheels/
 *.bcf
 *.run.xml
 *.xdv
+*.acn
+*.ist
 report.pdf
 
 # environment Variables

@@ -86,6 +86,8 @@ class BM25():
         # compute documents score
         # dictionary is (collection_name, index) -> score
         LOGGER.info("Computing words scores...")
+
+        LOGGER.info(f"words\n\n{query_words}")
         docs_scores: dict[tuple[str, int], int] = {}
         for word in query_words:
             documents: list[DocumentInfoDTO] = self.indexer.get_documents_for_word(
@@ -135,6 +137,8 @@ class BM25():
                 if len(matches) < number_returned_documents:
                     matches.append(tmp)
                 break
+
+        LOGGER.info(f"matched scores\n\n{matches}")
 
         # return best from disk given collection name and index
         LOGGER.ok(

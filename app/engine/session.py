@@ -9,9 +9,6 @@ from utils.logger import LOGGER
 
 
 class UserFeedback(BaseModel):
-    # session analytics
-    user_session_cookie: Optional[int]
-
     # UEQ
     annoying_vs_enjoyable: Optional[int] = Field(None, ge=1, le=7)
     not_understandable_vs_understandable: Optional[int] = Field(
@@ -50,16 +47,18 @@ class Session():
 
         LOGGER.info("Initializing session...")
 
-        self.warm_db(self.connection)
+        self.warm_db()
 
         LOGGER.ok("Session initialized")
 
     def warm_db(self):
-        # creates table if needed
-        self.connection.execute("CREATE SEQUENCE seq_feedback START 1")
+        try:
+            self.connection.execute("CREATE SEQUENCE seq_feedback START 1")
+        except Exception as _:
+            pass
         self.connection.execute("""
 CREATE TABLE IF NOT EXISTS user_feedback (
-feedback_id INTEGER PRIMARY KEY DEFAULT nextval('seq_lexicon'),
+feedback_id INTEGER PRIMARY KEY DEFAULT nextval('seq_feedback'),
 
 -- UEQ
 annoying_vs_enjoyable SMALLINT,
@@ -94,44 +93,44 @@ task_free_search_observations TEXT
             return
         self.connection.execute(
             """
-            INSERT INTO user_feedback (
-                annoying_vs_enjoyable,
-                not_understandable_vs_understandable,
-                unpleasant_vs_pleasant,
-                friendly_vs_unfriendly,
-                clear_vs_confusing,
-                use_frequently_question,
-                unnecessary_complexity_question,
-                most_people_learn_quickly_question,
-                felt_confident_question,
-                how_likely_to_recommend_question,
-                favorite_thing_about_site,
-                least_favorite_thing_about_site,
-                recommendations_for_changes,
-                task_flappy_bird_completed,
-                task_flappy_bird_observations,
-                task_free_search_completed,
-                task_free_search_observations
-            ) VALUES (
-                $annoying_vs_enjoyable,
-                $not_understandable_vs_understandable,
-                $unpleasant_vs_pleasant,
-                $friendly_vs_unfriendly,
-                $clear_vs_confusing,
-                $use_frequently_question,
-                $unnecessary_complexity_question,
-                $most_people_learn_quickly_question,
-                $felt_confident_question,
-                $how_likely_to_recommend_question,
-                $favorite_thing_about_site,
-                $least_favorite_thing_about_site,
-                $recommendations_for_changes,
-                $task_flappy_bird_completed,
-                $task_flappy_bird_observations,
-                $task_free_search_completed,
-                $task_free_search_observations
-            )
-            """,
+			INSERT INTO user_feedback (
+				annoying_vs_enjoyable,
+				not_understandable_vs_understandable,
+				unpleasant_vs_pleasant,
+				friendly_vs_unfriendly,
+				clear_vs_confusing,
+				use_frequently_question,
+				unnecessary_complexity_question,
+				most_people_learn_quickly_question,
+				felt_confident_question,
+				how_likely_to_recommend_question,
+				favorite_thing_about_site,
+				least_favorite_thing_about_site,
+				recommendations_for_changes,
+				task_flappy_bird_completed,
+				task_flappy_bird_observations,
+				task_free_search_completed,
+				task_free_search_observations
+			) VALUES (
+				$annoying_vs_enjoyable,
+				$not_understandable_vs_understandable,
+				$unpleasant_vs_pleasant,
+				$friendly_vs_unfriendly,
+				$clear_vs_confusing,
+				$use_frequently_question,
+				$unnecessary_complexity_question,
+				$most_people_learn_quickly_question,
+				$felt_confident_question,
+				$how_likely_to_recommend_question,
+				$favorite_thing_about_site,
+				$least_favorite_thing_about_site,
+				$recommendations_for_changes,
+				$task_flappy_bird_completed,
+				$task_flappy_bird_observations,
+				$task_free_search_completed,
+				$task_free_search_observations
+			)
+			""",
             feedback.model_dump(exclude={"feedback_id"})
         )
 

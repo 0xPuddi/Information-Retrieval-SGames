@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SGames - Feedback</title>
+
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-white.svg') }}"
+			media="(prefers-color-scheme: light)"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-dark.svg') }}"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-white.svg') }}"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='output.css') }}"
+		/>
+
+		<script
+			defer
+			src="{{ url_for('static', filename='client.js') }}"
+		></script>
+		<script
+			defer
+			src="{{ url_for('static', filename='feedback.js') }}"
+		></script>
+	</head>
+
+	<body class="bg-gray-100 py-10 px-2 flex items-center justify-center pb-10">
+		<div
+			class="w-screen min-h-screen px-4 lg:max-w-10/12 flex flex-col items-center justify-start gap-10"
+		>
+			<!-- title -->
+			<h1 class="text-4xl font-bold mb-6">Feedback Questionnaire</h1>
+
+			<!-- ue -->
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-6 gap-6"
+			>
+				<h2 class="text-2xl font-semibold">User Experience</h2>
+				{% set questions = [ ('annoying_vs_enjoyable', 'Annoying',
+				'Enjoyable'), ('not_understandable_vs_understandable', 'Not
+				Understandable', 'Understandable'), ('unpleasant_vs_pleasant',
+				'Unpleasant', 'Pleasant'), ('friendly_vs_unfriendly',
+				'Friendly', 'Unfriendly'), ('clear_vs_confusing', 'Clear',
+				'Confusing') ] %}
+
+				<form id="ue-form" class="flex flex-col gap-8 p-4">
+					<div
+						class="grid grid-cols-9 text-center text-xs text-gray-500 font-medium pb-2 border-b"
+					>
+						<div class="col-span-1 text-left"></div>
+						<div class="col-span-7 grid grid-cols-7 gap-1">
+							{% for i in range(1, 8) %}
+							<span class="p-1">{{ i }}</span>
+							{% endfor %}
+						</div>
+						<div class="col-span-1 text-right"></div>
+					</div>
+
+					{% for id, left, right in questions %}
+					<div
+						class="grid grid-cols-9 items-center text-sm text-gray-700"
+					>
+						<span class="col-span-1 text-left font-medium"
+							>{{ left }}</span
+						>
+
+						<div
+							class="col-span-7 grid grid-cols-7 gap-1 text-center"
+						>
+							{% for i in range(1, 8) %}
+							<label class="cursor-pointer flex justify-center">
+								<input
+									type="radio"
+									name="{{ id }}"
+									value="{{ i }}"
+									x-model="answers.{{ id }}"
+									class="accent-blue-500"
+								/>
+							</label>
+							{% endfor %}
+						</div>
+
+						<span class="col-span-1 text-right font-medium"
+							>{{ right }}</span
+						>
+					</div>
+					{% endfor %}
+				</form>
+			</div>
+
+			<!-- sus -->
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-6 gap-6"
+			>
+				<h2 class="text-2xl font-semibold">System Usability Scale</h2>
+
+				{% set questions = [ { 'id': 'use_frequently_question', 'text':
+				'I think I would like to use this tool frequently.' }, { 'id':
+				'unnecessary_complexity_question', 'text': 'I found the tool
+				unnecessarily complex.' }, { 'id':
+				'most_people_learn_quickly_question', 'text': 'I would imagine
+				that most people would learn to use this tool very quickly.' },
+				{ 'id': 'felt_confident_question', 'text': 'I felt very
+				confident using the tool.' }, ] %} {% set scale_5 = range(1, 6)
+				%}
+
+				<form
+					method="POST"
+					id="sus-form"
+					class="flex flex-col gap-6 p-4"
+				>
+					<h3 class="text-lg font-semibold pb-2">
+						User Experience Questions
+					</h3>
+
+					<div
+						class="grid grid-cols-6 gap-2 text-center text-xs font-medium text-gray-600 border-b pb-2"
+					>
+						<div></div>
+						<div>Strongly Disagree</div>
+						<div>Disagree</div>
+						<div>Neutral</div>
+						<div>Agree</div>
+						<div>Strongly Agree</div>
+					</div>
+
+					{% for q in questions %}
+					<div class="grid grid-cols-6 items-center gap-2">
+						<p class="col-span-1 text-sm text-gray-800">
+							{{ q.text }}
+						</p>
+
+						{% for i in scale_5 %}
+						<div class="flex justify-center">
+							<label class="cursor-pointer">
+								<input
+									type="radio"
+									name="{{ q.id }}"
+									class="accent-blue-500"
+									value="{{ i }}"
+									required
+								/>
+							</label>
+						</div>
+						{% endfor %}
+					</div>
+					{% endfor %}
+
+					<h3 class="text-lg font-semibold pt-4 pb-2 mt-6">
+						Recommendation
+					</h3>
+
+					<div class="flex flex-col gap-2">
+						<p class="text-sm text-gray-800">
+							How likely are you to recommend this website to
+							others?
+						</p>
+
+						<div
+							class="flex justify-between text-xs font-medium text-gray-600"
+						>
+							<span>Not at all likely</span>
+							<span>Extremely likely</span>
+						</div>
+
+						{% set scale_10 = range(1, 11) %}
+
+						<div class="flex justify-between gap-1">
+							{% for i in scale_10 %}
+							<div class="flex flex-col items-center">
+								<label class="cursor-pointer">
+									<input
+										type="radio"
+										name="how_likely_to_recommend_question"
+										class="accent-blue-500 mb-1"
+										value="{{ i }}"
+										required
+									/>
+								</label>
+								<span class="text-xs text-gray-500"
+									>{{ i }}</span
+								>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<!-- usability -->
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-6 gap-6"
+			>
+				<h2 class="text-2xl font-semibold">Usability Testing</h2>
+
+				<form id="usability-form" class="flex flex-col gap-4">
+					<p>What's your favorite thing about this site?</p>
+					<textarea
+						id="favorite_thing_about_site"
+						name="favorite_thing_about_site"
+						class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+					></textarea>
+
+					<p>What's your least favorite thing about this site?</p>
+					<textarea
+						id="least_favorite_thing_about_site"
+						name="least_favorite_thing_about_site"
+						class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+					></textarea>
+
+					<p>
+						Do you have any recommendation for changes to the way
+						this site looks or works?
+					</p>
+					<textarea
+						id="recommendations_for_changes"
+						name="recommendations_for_changes"
+						class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+					></textarea>
+
+					<div class="flex flex-col gap-4 mt-6">
+						<h3 class="text-xl font-semibold">Search Questions</h3>
+
+						<div class="flex items-center gap-4">
+							<p class="flex-1">Task: Flappy Bird</p>
+							<div class="flex gap-2 items-center">
+								<label class="flex items-center gap-1"
+									><input
+										type="radio"
+										name="task_flappy_bird_completed"
+										value="true"
+										class="accent-blue-500"
+									/>
+									Completed</label
+								>
+								<label class="flex items-center gap-1"
+									><input
+										type="radio"
+										name="task_flappy_bird_completed"
+										value="false"
+										class="accent-blue-500"
+									/>
+									Failed</label
+								>
+							</div>
+						</div>
+						<textarea
+							id="task_flappy_bird_observations"
+							name="task_flappy_bird_observations"
+							class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+							placeholder="Observations"
+						></textarea>
+
+						<div class="flex items-center gap-4">
+							<p class="flex-1">Task: Free Search</p>
+							<div class="flex gap-2 items-center">
+								<label class="flex items-center gap-1"
+									><input
+										type="radio"
+										name="task_free_search_completed"
+										value="true"
+										class="accent-blue-500"
+									/>
+									Completed</label
+								>
+								<label class="flex items-center gap-1"
+									><input
+										type="radio"
+										name="task_free_search_completed"
+										value="false"
+										class="accent-blue-500"
+									/>
+									Failed</label
+								>
+							</div>
+						</div>
+						<textarea
+							id="task_free_search_observations"
+							name="task_free_search_observations"
+							class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+							placeholder="Observations"
+						></textarea>
+					</div>
+				</form>
+			</div>
+
+			<button
+				type="button"
+				onclick="getFormDataAndSubmit()"
+				class="mt-8 p-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition cursor-pointer click"
+			>
+				Submit Feedback
+			</button>
+
+			<div id="feedback_message"></div>
+		</div>
+	</body>
+</html>

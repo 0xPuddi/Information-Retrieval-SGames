@@ -8,36 +8,146 @@
 			href="{{ url_for('static', filename='output.css') }}"
 		/>
 
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-white.svg') }}"
+			media="(prefers-color-scheme: light)"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-dark.svg') }}"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-white.svg') }}"
+		/>
+
 		<script
 			defer
 			src="{{ url_for('static', filename='client.js') }}"
 		></script>
+		<script
+			defer
+			src="{{ url_for('static', filename='filters.js') }}"
+		></script>
 	</head>
 
-	<body class="bg-gray-50 flex justify-center py-10">
-		<div class="w-full max-w-5xl px-4 lg:w-[70%]">
-			<div class="flex items-center gap-2 mb-8">
+	<body class="bg-gray-100 py-10 px-2 flex items-center justify-center">
+		<div
+			class="w-screen min-h-screen px-4 lg:max-w-8/12 flex flex-col items-center justify-start gap-10"
+		>
+			<div
+				class="flex items-start justify-center gap-5 w-full sticky top-5"
+			>
 				<input
 					id="search-input"
 					type="text"
 					placeholder="Search for Games…"
 					onkeypress="search(event)"
-					class="grow px-4 py-3 rounded-xl shadow-md border border-gray-300 text-lg focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
+					class="grow px-4 py-3 rounded-xl shadow-2xl border border-gray-500 text-lg focus:ring-2 focus:ring-blue-400 focus:outline-none bg-white"
 				/>
 
 				<button
 					onclick="triggerSearch()"
-					class="p-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition shadow-md flex items-center justify-center"
+					class="click p-3 rounded-xl bg-blue-900 hover:bg-blue-400 cursor-pointer transition-all shadow-md flex items-center justify-center"
 				>
 					<img
-						src="/magnifying-glass.svg"
+						src="{{ url_for('static', filename='ui/Magnifier.svg') }}"
 						alt="search"
 						class="w-6 h-6 invert"
 					/>
 				</button>
 			</div>
 
-			<div id="items-container" class="flex flex-col gap-6"></div>
+			<div
+				class="w-3/4 px-10 rounded-3xl shadow-md flex flex-col bg-white py-3 gap-6"
+			>
+				<!-- filters -->
+				<div
+					class="flex flex-row items-center justify-evenly flex-wrap gap-7 w-full"
+				>
+					<div
+						class="min-w-44 flex flex-col gap-1 items-start justify-center"
+					>
+						<label class="filter-label">Platform</label>
+						<select
+							id="platformFilter"
+							class="w-full cursor-pointer border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+						>
+							<option value="">Select platform</option>
+							<option value="windows">Windows</option>
+							<option value="macos">macOS</option>
+							<option value="html5">HTML5</option>
+							<option value="android">Android</option>
+							<option value="ios">iOS</option>
+						</select>
+					</div>
+
+					<div
+						class="min-w-44 flex flex-col gap-1 items-start justify-center"
+					>
+						<label class="filter-label">Category</label>
+						<select
+							id="categoryFilter"
+							class="w-full cursor-pointer border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+						>
+							<option value="">Select category</option>
+							<option>Action</option>
+							<option>Destruction</option>
+							<option>Zombies</option>
+							<option>Gambling</option>
+							<option>Free to play</option>
+							<option>RPG</option>
+							<option>Card Game</option>
+							<option>Rougelike</option>
+							<option>Strategy</option>
+							<option>Early Access</option>
+							<option>FPS</option>
+							<option>Multiplayer</option>
+							<option>Adventure</option>
+							<option>Platformer</option>
+						</select>
+					</div>
+
+					<div
+						class="min-w-44 flex flex-col gap-1 items-start justify-center"
+					>
+						<label class="filter-label">Status</label>
+						<select
+							id="statusFilter"
+							class="w-full cursor-pointer border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+						>
+							<option value="">Select status</option>
+							<option>Published</option>
+							<option>To Be Released</option>
+						</select>
+					</div>
+				</div>
+
+				<div
+					class="flex flex-col items-center justify-center w-full gap-2"
+				>
+					<div
+						class="w-full flex items-start justify-center sm:items-center sm:justify-start gap-1 sm:gap-6 flex-col sm:flex-row"
+					>
+						<label class="filter-label">Tags</label>
+						<input
+							type="text"
+							id="tagInput"
+							placeholder="Enter a tag and press Enter"
+							class="border-2 rounded sm:w-64 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+						/>
+					</div>
+
+					<div
+						class="flex flex-wrap flex-row justify-start items-center w-full gap-4"
+						id="tagContainer"
+					></div>
+				</div>
+			</div>
+
+			<div id="items-container" class="flex flex-col w-full gap-10"></div>
 		</div>
 	</body>
 </html>

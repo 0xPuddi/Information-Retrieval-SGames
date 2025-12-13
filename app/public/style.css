@@ -1,1 +1,13 @@
 @import 'tailwindcss';
+
+.filter-label {
+	@apply font-medium text-lg text-black;
+}
+
+.click {
+	@apply transition-transform duration-125;
+}
+
+.click:active {
+	@apply scale-80;
+}

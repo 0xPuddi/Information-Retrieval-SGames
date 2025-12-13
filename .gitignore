@@ -40,3 +40,5 @@ report.pdf
 
 # others
 .DS_Store
+node_modules
+output.css

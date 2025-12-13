@@ -4,6 +4,7 @@ from app.engine.indexer import Indexer
 
 from flask import Flask, render_template, request
 
+from app.engine.session import Session
 from utils.logger import LOGGER
 
 # global initialization
@@ -12,6 +13,9 @@ LOGGER.info("Initializing app...")
 app = Flask(__name__,
             static_folder='public',
             template_folder='templates')
+
+# session
+session = Session()
 
 # parser
 parser = Parser()
@@ -37,7 +41,7 @@ def query():
         return "Missing \"query\" field", 400
 
     items = bm25.query_sources_documents(
-        body["query"], body["documents"] if ("documents" in body and isinstance(body["documents"], int)) else 10)
+        parser.parse_text_to_words(body["query"]), body["documents"] if ("documents" in body and isinstance(body["documents"], int)) else 10)
     return render_template('components/card.html', documents=[doc.model_dump() for doc in items])
 
 

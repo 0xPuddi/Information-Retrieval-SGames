@@ -1,4 +1,8 @@
 run:
+	cd ./app
+	npm i
+	npx @tailwindcss/cli -i ./public/style.css -o ./public/output.css
+	cd ..
 	uv run app
 
 scrapers:

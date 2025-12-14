@@ -11,3 +11,7 @@
 .click:active {
 	@apply scale-80;
 }
+
+@theme {
+	--color-primary-blue: #1c398e;
+}

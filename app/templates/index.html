@@ -31,14 +31,20 @@
 			defer
 			src="{{ url_for('static', filename='filters.js') }}"
 		></script>
+
+		<!-- Used in image card -->
+		<script>
+			const FALLBACK_IMAGE_URL =
+				"{{ url_for('static', filename='ui/missing-thumbnail.svg') }}";
+		</script>
 	</head>
 
-	<body class="bg-gray-100 py-10 px-2 flex items-center justify-center">
+	<body class="bg-gray-100 py-14 px-2 flex items-center justify-center">
 		<div
 			class="w-screen min-h-screen px-4 lg:max-w-8/12 flex flex-col items-center justify-start gap-10"
 		>
 			<div
-				class="flex items-start justify-center gap-5 w-full sticky top-5"
+				class="flex items-center justify-start gap-5 w-full sticky top-5 z-10"
 			>
 				<input
 					id="search-input"
@@ -61,7 +67,7 @@
 			</div>
 
 			<div
-				class="w-3/4 px-10 rounded-3xl shadow-md flex flex-col bg-white py-3 gap-6"
+				class="w-3/4 px-10 rounded-3xl shadow-md flex flex-col bg-white py-3 gap-6 z-0"
 			>
 				<!-- filters -->
 				<div
@@ -75,9 +81,9 @@
 							id="platformFilter"
 							class="w-full cursor-pointer border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
 						>
-							<option value="">Select platform</option>
+							<option value="">Any</option>
 							<option value="windows">Windows</option>
-							<option value="macos">macOS</option>
+							<option value="mac">macOS</option>
 							<option value="html5">HTML5</option>
 							<option value="android">Android</option>
 							<option value="ios">iOS</option>
@@ -92,21 +98,27 @@
 							id="categoryFilter"
 							class="w-full cursor-pointer border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
 						>
-							<option value="">Select category</option>
-							<option>Action</option>
-							<option>Destruction</option>
-							<option>Zombies</option>
-							<option>Gambling</option>
-							<option>Free to play</option>
-							<option>RPG</option>
-							<option>Card Game</option>
-							<option>Rougelike</option>
-							<option>Strategy</option>
-							<option>Early Access</option>
-							<option>FPS</option>
-							<option>Multiplayer</option>
-							<option>Adventure</option>
-							<option>Platformer</option>
+							<option value="">Any</option>
+							<option value="action">Action</option>
+							<option value="destruction">Destruction</option>
+							<option value="zombies">Zombies</option>
+							<option value="gambling">Gambling</option>
+							<option value="free to play">Free to play</option>
+							<option value="rpg">RPG</option>
+							<option value="card game">Card Game</option>
+							<option value="rougelike">Rougelike</option>
+							<option value="strategy">Strategy</option>
+							<option value="early access">Early Access</option>
+							<option value="fps">FPS</option>
+							<option value="multiplayer">Multiplayer</option>
+							<option value="adventure">Adventure</option>
+							<option value="platformer">Platformer</option>
+							<option value="indie">Indie</option>
+							<option value="puzzle">Puzzle</option>
+							<option value="simulation">Simulation</option>
+							<option value="mmorpg">MMORPG</option>
+							<option value="open world">Open World</option>
+							<option value="auto battler">Auto Battler</option>
 						</select>
 					</div>
 
@@ -118,9 +130,11 @@
 							id="statusFilter"
 							class="w-full cursor-pointer border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
 						>
-							<option value="">Select status</option>
-							<option>Published</option>
-							<option>To Be Released</option>
+							<option value="">Any</option>
+							<option value="Published">Published</option>
+							<option value="To Be Released">
+								To Be Released
+							</option>
 						</select>
 					</div>
 				</div>
@@ -147,7 +161,10 @@
 				</div>
 			</div>
 
-			<div id="items-container" class="flex flex-col w-full gap-10"></div>
+			<div
+				id="items-container"
+				class="flex flex-col w-full gap-10 z-0"
+			></div>
 		</div>
 	</body>
 </html>

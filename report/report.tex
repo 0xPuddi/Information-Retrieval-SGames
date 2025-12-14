@@ -85,6 +85,11 @@ Then I created the \textit{Indexer}, which is responsible for reading the collec
 Briefly, I count different frequencies, then build the inverted index with lexicon, postings and a middle table to properly compute the Okapi BM25 provided by the \href{https://en.wikipedia.org/wiki/Okapi_BM25}{wikipedia reference}.
 % BM25 computatio is done in the \textit{BM25} object in the \textit{BM25.py} file. The Object relies on the \textit{Indexer} to get frequencies informations.
 
+% talk about normalization, filtering
+% talk about development challenges on how to filter
+% calculations ar simple to make, but architecure of the system and performances are very hard -> talk about the implementation architecture, pros, cons and improvements
+% very inconsisten: gta returns correctly, grand theft auto does not
+
 At the moment, we can build and retrieve documents.
 Yet, building the indexer is not very efficient and the precision of the current algorithm is questionable.
 To complete the project I plan to modify both the \textit{Indexer} and the \textit{BM25} algorithm to address those two issues.
@@ -99,6 +104,8 @@ I plan to expand the web server by making the Homepage clear and provided with a
 Introduce questionnaires to get feedback both before using the engine and after, along with examples queries that users can make to evaluate the system.
 % Then I will also give each document a dedicated page entry displaying its information with much greater detail.
 Here too I will cite sources and explain it in greater detail.
+
+% talk about hard to make a good user interface
 
 % \section{Conclusion}
 %

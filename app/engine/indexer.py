@@ -443,4 +443,57 @@ WHERE l.word = ?
 																																																""", [word]).fetchall()
 
         return [DocumentInfoDTO(
-                collection_name=r[0], index=r[1], word_frequency_within_document=r[2], words_length=r[3]) for r in results]
+            collection_name=r[0], index=r[1], word_frequency_within_document=r[2], words_length=r[3]) for r in results]
+
+    def filter_documents(self, docs_scores: dict[tuple[str, int], int], platform: str, category: str, status: str, tags: list[str]) -> dict[tuple[str, int], int]:
+        sub_collections: dict[str, list[Document]] = {}
+        new_docs_scores: dict[tuple[str, int], int] = {}
+
+        for doc, score in docs_scores.items():
+            cname = doc[0]
+
+            if cname not in sub_collections:
+                sub_collections[cname] = self.read_collection_by_name(cname)
+
+            # check filters for document
+            index = doc[1]
+            if index < len(sub_collections[cname]):
+                d: Document = sub_collections[cname][index]
+
+                if platform and platform != "":
+                    if not d.metadata.platforms:
+                        continue
+
+                    lowercase_d_platforms = [
+                        platform.lower() for platform in d.metadata.platforms]
+                    if platform not in lowercase_d_platforms:
+                        continue
+
+                if category and category != "":
+                    if not d.metadata.category or category.lower() != d.metadata.category.lower():
+                        continue
+
+                if status and status != "":
+                    if not d.metadata.status or status.lower() != d.metadata.status.lower():
+                        continue
+
+                if tags and len(tags) > 0:
+                    if not d.metadata.tags or len(d.metadata.tags) == 0:
+                        continue
+
+                    lowercase_d_tags = [tag.lower() for tag in d.metadata.tags]
+                    missing_one = False
+                    for tag in tags:
+                        if tag.lower() not in lowercase_d_tags:
+                            missing_one = True
+                            break
+
+                    if missing_one:
+                        continue
+
+                # we got here
+                new_docs_scores[doc] = score
+            else:
+                LOGGER.error(f"Index out of bounds for collection: {index}")
+
+        return new_docs_scores

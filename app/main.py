@@ -43,8 +43,26 @@ def query():
 
     LOGGER.info(f"body: {body}")
 
+    n = body["documents"] if (
+        "documents" in body and isinstance(body["documents"], int)) else 30
+    platform = body["platform"] if (
+        "platform" in body and isinstance(body["platform"], str)) else None
+    category = body["category"] if (
+        "category" in body and isinstance(body["category"], str)) else None
+    status = body["status"] if (
+        "status" in body and isinstance(body["status"], str)) else None
+    tags = body["tags"] if (
+        "tags" in body and isinstance(body["tags"], list)) else []
+
     items = bm25.query_sources_documents(
-        parser.parse_text_to_words(body["query"]), body["documents"] if ("documents" in body and isinstance(body["documents"], int)) else 10)
+        parser.parse_text_to_words(body["query"]),
+        n,
+        platform,
+        category,
+        status,
+        tags
+    )
+
     return render_template('components/card.html', documents=[doc.model_dump() for doc in items])
 
 

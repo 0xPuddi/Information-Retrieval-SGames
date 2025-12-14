@@ -14,7 +14,7 @@ tagInput.addEventListener('keydown', (e) => {
 			const tagEl = document.createElement('span');
 			tagEl.textContent = tag;
 			tagEl.className =
-				'bg-blue-100 text-blue-900 px-2 py-1 rounded-lg flex items-center gap-2 text-md';
+				'bg-blue-50 text-black px-2 py-1 rounded-lg flex items-center gap-2 text-md';
 
 			// remove button
 			const removeBtn = document.createElement('button');
@@ -22,11 +22,11 @@ tagInput.addEventListener('keydown', (e) => {
 				<img
 					src="/public/ui/x.svg"
 					alt="delete icon"
-					class="w-3 h-3"
+					class="w-2 h-2"
 				/>
 			`;
 			removeBtn.className =
-				'bg-blue-200 rounded-full h-6 w-6 shadow-md font-bold click cursor-pointer flex items-center justify-center click';
+				'bg-primary-blue rounded-full h-4 w-4 shadow-md font-bold click cursor-pointer flex items-center justify-center click';
 			removeBtn.addEventListener('click', () => {
 				tags.delete(tag);
 				tagEl.remove();

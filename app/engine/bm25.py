@@ -68,7 +68,7 @@ class BM25():
         LOGGER.ok("Documents loaded from disk")
         return documents
 
-    def query_sources_documents(self, query_words: list[str], number_returned_documents: int) -> list[Document]:
+    def query_sources_documents(self, query_words: list[str], number_returned_documents: int, platform: str, category: str, status: str, tags: list[str]) -> list[Document]:
         """
         Calculates matches and return best matched documents
 
@@ -88,6 +88,7 @@ class BM25():
         LOGGER.info("Computing words scores...")
 
         LOGGER.info(f"words\n\n{query_words}")
+        # dict is (collection name, index -> score)
         docs_scores: dict[tuple[str, int], int] = {}
         for word in query_words:
             documents: list[DocumentInfoDTO] = self.indexer.get_documents_for_word(
@@ -103,7 +104,6 @@ class BM25():
                     docs_scores[key] = score
         LOGGER.ok("Words scores computed")
 
-        #
         if len(docs_scores) == 0:
             LOGGER.warn("No documents scores")
             return []
@@ -111,6 +111,11 @@ class BM25():
         # keep only best number_returned_documents matches out
         # of all docs_scores
         LOGGER.ok(f"Getting best {number_returned_documents} matches...")
+        LOGGER.ok(f"With filters: {platform}, {category}, {status}, {tags}")
+
+        docs_scores = self.indexer.filter_documents(
+            docs_scores, platform, category, status, tags)
+
         matches: list[tuple[tuple[str, int], int]] = []
         for doc, score in docs_scores.items():
             if len(matches) == 0:

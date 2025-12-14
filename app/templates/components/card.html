@@ -1,86 +1,148 @@
 {% for d in documents %}
 <div
-	class="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white hover:shadow-xl transition-shadow duration-300 cursor-pointer relative"
+	class="flex items-center justify-center p-4 rounded-xl shadow-lg bg-white hover:shadow-xl transition-shadow duration-300 cursor-pointer"
 >
-	<div class="absolute top-5 right-5">
-		<a href="{{ d.source.url }}" target="_blank">
-			<img
-				src="{{ url_for('static', filename='ui/export.svg') }}"
-				class="w-6 h-6 fill-blue-500 click"
-			/>
-		</a>
-	</div>
+	<div
+		class="flex flex-col gap-4 w-11/12 relative items-center justify-center"
+	>
+		<div
+			class="w-full flex items-center justify-start gap-10 h-40 relative"
+		>
+			<div class="absolute top-0 right-0">
+				<a href="{{ d.source.url }}" target="_blank">
+					<button
+						class="click p-3 rounded-xl bg-blue-900 hover:bg-blue-400 cursor-pointer transition-all shadow-md flex items-center justify-center"
+					>
+						<img
+							src="{{ url_for('static', filename='ui/export.svg') }}"
+							class="w-6 h-6"
+						/>
+					</button>
+				</a>
+			</div>
 
-	<div class="flex items-center justify-start gap-10 h-60">
-		<div class="w-56 h-36 overflow-hidden rounded-lg bg-gray-200">
-			<img
-				src="{{ d.metadata.images[0] }}"
-				alt="{{ d.metadata.title }} thumbnail"
-				class="w-full h-full object-cover"
-			/>
+			<div class="w-56 max-h-28 overflow-hidden rounded-lg bg-gray-200">
+				{% if d.metadata.images %}
+				<img
+					src="{{ d.metadata.images[0] }}"
+					alt="{{ d.metadata.title }} thumbnail"
+					class="w-full h-full object-cover"
+					onerror="this.src = FALLBACK_IMAGE_URL;"
+				/>
+				{% else %}
+				<img
+					src="{{ url_for('static', filename='ui/missing-thumbnail.svg') }}"
+					alt="Default missing thumbnail"
+					class="w-full h-full object-cover"
+				/>
+				{% endif %}
+			</div>
+
+			<div class="flex h-10/12 flex-col grow items-start justify-evenly">
+				<div class="w-full flex items-center justify-start gap-10">
+					<div class="flex items-center justify-center">
+						<h3 class="text-lg font-semibold text-gray-900">
+							{{ d.metadata.title }}
+						</h3>
+					</div>
+
+					<div class="flex items-center justify-center gap-2">
+						{% if d.metadata.platforms is iterable and d.metadata is
+						not string %} {% for p in d.metadata.platforms %} {% if
+						p == "windows" %}
+						<img
+							src="{{ url_for('static', filename='platforms/windows.svg') }}"
+							class="w-6 h-6 fill-gray-500"
+						/>
+						{% elif p == "linux" %}
+						<img
+							src="{{ url_for('static', filename='platforms/linux.svg') }}"
+							class="w-6 h-6 fill-gray-500"
+						/>
+						{% elif p == "macos" %}
+						<img
+							src="{{ url_for('static', filename='platforms/apple.svg') }}"
+							class="w-6 h-6 fill-gray-500"
+						/>
+						{% elif p == "ios" %}
+						<img
+							src="{{ url_for('static', filename='platforms/apple.svg') }}"
+							class="w-6 h-6 fill-gray-500"
+						/>
+						{% endif %} {% endfor %} {% endif %}
+					</div>
+				</div>
+
+				<div class="flex flex-row justify-start items-center gap-4">
+					<div
+						class="bg-primary-blue shadow-xl flex items-center justify-center rounded-2xl py-1 px-2"
+					>
+						<p class="text-md text-white space-y-1">
+							{{ d.metadata.author }}
+						</p>
+					</div>
+
+					<div
+						class="bg-primary-blue shadow-xl flex items-center justify-center rounded-2xl py-1 px-2"
+					>
+						<p class="text-md text-white space-y-1">
+							{{ d.metadata.category }}
+						</p>
+					</div>
+
+					<div
+						class="bg-primary-blue shadow-xl flex items-center justify-center rounded-2xl py-1 px-2"
+					>
+						<p class="text-md text-white space-y-1">
+							{{ d.metadata.status }}
+						</p>
+					</div>
+				</div>
+
+				<!-- tags -->
+				<div class="flex flex-wrap gap-2">
+					{% if d.metadata and d.metadata.tags is iterable %} {% for
+					tag in (d.metadata.tags | default([]))[:5] %}
+					<span
+						class="bg-blue-50 text-black px-2 py-1 rounded-lg flex items-center text-xs"
+					>
+						{{ tag }}
+					</span>
+					{% endfor %} {% endif %}
+				</div>
+			</div>
 		</div>
 
-		<div class="flex h-full flex-col grow items-start justify-evenly">
-			<h3 class="text-lg font-semibold text-gray-900">
-				{{ d.metadata.title }}
-			</h3>
-
-			<div class="flex flex-row justify-start items-center gap-4">
+		<div class="w-full flex items-center justify-center">
+			<div class="w-full flex items-center justify-center">
 				<div
-					class="bg-gray-700 shadow-xl flex items-center justify-center rounded-2xl py-1 px-2"
+					class="w-3/4 px-4 overflow-hidden h-[600px] bg-blue-50 rounded-t-lg py-3"
 				>
-					<p class="text-sm text-white space-y-1">
-						{{ d.metadata.author }}
-					</p>
-				</div>
-
-				<div
-					class="bg-gray-700 shadow-xl flex items-center justify-center rounded-2xl py-1 px-2"
-				>
-					<p class="text-sm text-white space-y-1">
-						{{ d.metadata.status }}
-					</p>
-				</div>
-
-				<div
-					class="bg-gray-700 shadow-xl flex items-center justify-center rounded-2xl py-1 px-2"
-				>
-					<p class="text-sm text-white space-y-1">
-						{{ d.metadata.category }}
-					</p>
+					{{ d.metadata.description | safe }}
 				</div>
 			</div>
 
-			<div class="w-full flex items-center justify-start gap-2">
-				{% if d.metadata.platforms is iterable and d.metadata is not
-				string %} {% for p in d.metadata.platforms %} {% if p ==
-				"windows" %}
-				<img
-					src="{{ url_for('static', filename='platforms/windows.svg') }}"
-					class="w-6 h-6 fill-gray-500"
-				/>
-				{% elif p == "linux" %}
-				<img
-					src="{{ url_for('static', filename='platforms/linux.svg') }}"
-					class="w-6 h-6 fill-gray-500"
-				/>
-				{% elif p == "macos" %}
-				<img
-					src="{{ url_for('static', filename='platforms/apple.svg') }}"
-					class="w-6 h-6 fill-gray-500"
-				/>
-				{% elif p == "ios" %}
-				<img
-					src="{{ url_for('static', filename='platforms/apple.svg') }}"
-					class="w-6 h-6 fill-gray-500"
-				/>
-				{% endif %} {% endfor %} {% endif %}
-			</div>
+			<div
+				class="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
+				style="
+					background: linear-gradient(
+						to top,
+						white 20%,
+						rgba(255, 255, 255, 0) 100%
+					);
+				"
+			></div>
 		</div>
-	</div>
 
-	<div class="w-full px-4 overflow-hidden h-80">
-		{{ d.metadata.description | safe }}
+		<div class="absolute bottom-2 right-2">
+			{% if d.source and d.source.name %}
+			<img
+				src="{{ url_for('static', filename='ui/') }}{{ d.source.name }}.svg"
+				alt="{{ d.source.name }} logo"
+				class="w-10 h-10 opacity-70"
+			/>
+			{% endif %}
+		</div>
 	</div>
 </div>
 {% endfor %}

@@ -52,6 +52,9 @@ async function search(event) {
 			// replace container content
 			const container = document.getElementById('items-container');
 			container.innerHTML = html;
+
+			// highlight
+			highlightWords(query);
 		} catch (err) {
 			console.error(err);
 			alert('Error fetching data.');

@@ -6,6 +6,7 @@ from app.engine.indexer import Indexer
 from flask import Flask, render_template, request
 
 from app.engine.session import Session, UserFeedback
+from collection.models.document import Document
 from utils.logger import LOGGER
 
 # global initialization
@@ -62,8 +63,47 @@ def query():
         status,
         tags
     )
+    return [doc.model_dump() for doc in items], 200
 
+
+@app.route('/render/documents', methods=["POST"])
+def render_documents():
+    body = request.get_json()
+
+    if not isinstance(body["documents"], list):
+        return "Missing \"documents\" field", 400
+
+        # parse documents
+    items = []
+    try:
+        for d in body["documents"]:
+            items.append(Document(**d))
+    except ValidationError as e:
+        return {"Wrong object field": e.errors()}, 400
+    except Exception as e:
+        LOGGER.warn(f"Unexpected error: {e}")
+        return "Failed to parse documents", 400
+
+    # we then render
     return render_template('components/card.html', documents=[doc.model_dump() for doc in items])
+
+
+@app.route('/document', methods=["GET"])
+def document():
+    # ?id="itch"
+    id = request.args.get('id')
+    # ?collection="itch"
+    collection = request.args.get('collection')
+
+    if not id and not collection:
+        return "Missing \"id\" or \"collection\" query parameter", 400
+
+    # get doc
+    document: Document = indexer.get_document_by_id_and_collection_name(
+        id, collection)
+
+    # render
+    return render_template('document.html', d=document)
 
 
 @app.route('/feedback', methods=["POST"])

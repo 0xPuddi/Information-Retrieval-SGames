@@ -14,7 +14,7 @@ tagInput.addEventListener('keydown', (e) => {
 			const tagEl = document.createElement('span');
 			tagEl.textContent = tag;
 			tagEl.className =
-				'bg-blue-50 text-black px-2 py-1 rounded-lg flex items-center gap-2 text-md';
+				'bg-blue-100 text-black px-2 py-1 rounded-lg flex items-center gap-2 text-md';
 
 			// remove button
 			const removeBtn = document.createElement('button');

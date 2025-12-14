@@ -443,7 +443,7 @@ WHERE l.word = ?
 																																																""", [word]).fetchall()
 
         return [DocumentInfoDTO(
-            collection_name=r[0], index=r[1], word_frequency_within_document=r[2], words_length=r[3]) for r in results]
+                collection_name=r[0], index=r[1], word_frequency_within_document=r[2], words_length=r[3]) for r in results]
 
     def filter_documents(self, docs_scores: dict[tuple[str, int], int], platform: str, category: str, status: str, tags: list[str]) -> dict[tuple[str, int], int]:
         sub_collections: dict[str, list[Document]] = {}
@@ -497,3 +497,13 @@ WHERE l.word = ?
                 LOGGER.error(f"Index out of bounds for collection: {index}")
 
         return new_docs_scores
+
+    def get_document_by_id_and_collection_name(self, id, collection) -> Document | None:
+        if not collection:
+            return None
+
+        documents: list[Document] = self.read_collection_by_name(collection)
+        for d in documents:
+            if d.id == id:
+                return d
+        return None

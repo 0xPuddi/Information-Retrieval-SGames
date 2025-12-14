@@ -1,3 +1,7 @@
+async function goto(url) {
+	window.location.href = url;
+}
+
 async function submitFeedback(feedbackData) {
 	console.log('feedback: ', feedbackData);
 
@@ -18,6 +22,8 @@ async function submitFeedback(feedbackData) {
 		return false;
 	}
 }
+
+let DOCUMENTS;
 
 async function search(event) {
 	if (event.key === 'Enter') {
@@ -47,12 +53,23 @@ async function search(event) {
 
 			if (!response.ok) throw new Error('API error');
 
-			const html = await response.text();
+			// store documents
+			DOCUMENTS = await response.json();
+
+			// render them
+			const renderResponse = await fetch('/render/documents', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ documents: DOCUMENTS }),
+			});
+
+			const html = await renderResponse.text();
 
 			// replace container content
 			const container = document.getElementById('items-container');
 			container.innerHTML = html;
-
 			// highlight
 			highlightWords(query);
 		} catch (err) {

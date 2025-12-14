@@ -12,6 +12,14 @@
 	@apply scale-80;
 }
 
+.click-xs {
+	@apply transition-transform duration-125;
+}
+
+.click-xs:active {
+	@apply scale-95;
+}
+
 .highlight-match {
 	@apply bg-yellow-200 text-black;
 }

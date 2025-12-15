@@ -9,6 +9,10 @@ function checkFlappyBirdChallenge(query) {
 			'flappy-bird-challenge-container',
 			'flappy-bird-icon',
 		);
+
+		document.getElementById('feedback-label-container').innerHTML = `
+				<p class="text-black">Look for your favorite game!</p>
+			`;
 	}
 }
 
@@ -23,6 +27,10 @@ function checkFreeSearchChallenge(query) {
 			'free-search-icon',
 		);
 
+		// remove label
+		document
+			.getElementById('feedback-label-container')
+			.classList.add('hidden');
 		// add feedback button
 		document
 			.getElementById('feedback-button-container')

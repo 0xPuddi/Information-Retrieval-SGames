@@ -168,51 +168,56 @@
 					></div>
 				</div>
 
-				<div class="flex items-center justify-center gap-5">
-					<div
-						id="flappy-bird-challenge-container"
-						class="w-12 h-12 not-completed relative"
-					>
-						<img
-							src="{{ url_for('static', filename='ui/flappy-bird.jpg') }}"
-							alt="Flappy bird challenge"
-							class="w-full h-full object-cover"
-						/>
-
+				<div class="flex items-center justify-center gap-5 flex-col">
+					<div class="flex items-center justify-center gap-5">
 						<div
-							id="flappy-bird-icon"
-							class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
+							id="flappy-bird-challenge-container"
+							class="w-12 h-12 not-completed relative"
 						>
 							<img
-								src="{{ url_for('static', filename='ui/question-mark.svg') }}"
+								src="{{ url_for('static', filename='ui/flappy-bird.jpg') }}"
+								alt="Flappy bird challenge"
+								class="w-full h-full object-cover"
+							/>
+
+							<div
+								id="flappy-bird-icon"
+								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
+							>
+								<img
+									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
+									alt="Free search challenge"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+						</div>
+
+						<div
+							id="free-search-challenge-container"
+							class="w-12 h-12 not-completed relative"
+						>
+							<img
+								src="{{ url_for('static', filename='ui/free-search.svg') }}"
 								alt="Free search challenge"
 								class="w-full h-full object-cover"
 							/>
+
+							<div
+								id="free-search-icon"
+								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
+							>
+								<img
+									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
+									alt="Free search challenge"
+									class="w-full h-full object-cover"
+								/>
+							</div>
 						</div>
 					</div>
 
-					<div
-						id="free-search-challenge-container"
-						class="w-12 h-12 not-completed relative"
-					>
-						<img
-							src="{{ url_for('static', filename='ui/free-search.svg') }}"
-							alt="Free search challenge"
-							class="w-full h-full object-cover"
-						/>
-
-						<div
-							id="free-search-icon"
-							class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
-						>
-							<img
-								src="{{ url_for('static', filename='ui/question-mark.svg') }}"
-								alt="Free search challenge"
-								class="w-full h-full object-cover"
-							/>
-						</div>
+					<div id="feedback-label-container">
+						<p class="text-black">Look for flappy bird!</p>
 					</div>
-
 					<div id="feedback-button-container" class="hidden">
 						<a href="/feedback">
 							<button

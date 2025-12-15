@@ -56,6 +56,16 @@ async function search(event) {
 			// store documents
 			DOCUMENTS = await response.json();
 
+			const container = document.getElementById('items-container');
+			if (DOCUMENTS instanceof Array && DOCUMENTS.length == 0) {
+				container.innerHTML = `
+				<div class="w-full flex items-center justify-center">
+					<h1 class="text-2xl font-medium">No results found</h1>
+				</div>
+				`;
+				return;
+			}
+
 			// render them
 			const renderResponse = await fetch('/render/documents', {
 				method: 'POST',
@@ -68,7 +78,6 @@ async function search(event) {
 			const html = await renderResponse.text();
 
 			// replace container content
-			const container = document.getElementById('items-container');
 			container.innerHTML = html;
 			// highlight
 			highlightWords(query);

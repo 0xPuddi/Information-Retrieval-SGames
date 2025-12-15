@@ -175,7 +175,7 @@ class Indexer():
         # create table if not there
         self.connection.execute("""
 CREATE TABLE IF NOT EXISTS collection_info (
-		data JSON
+	data JSON
 )
 """)
 
@@ -249,13 +249,13 @@ CREATE TABLE IF NOT EXISTS collection_info (
         con.execute("CREATE SEQUENCE seq_document START 1")
         con.execute("""
 CREATE TABLE IF NOT EXISTS documents (
-																document_id INTEGER PRIMARY KEY DEFAULT nextval('seq_document'),
+	document_id INTEGER PRIMARY KEY DEFAULT nextval('seq_document'),
 
-																collection_name VARCHAR NOT NULL,
-																index INTEGER NOT NULL,
-																words_length INTEGER NOT NULL,
+	collection_name VARCHAR NOT NULL,
+	index INTEGER NOT NULL,
+	words_length INTEGER NOT NULL,
 
-																UNIQUE(collection_name, index)
+	UNIQUE(collection_name, index)
 )
 """)
 
@@ -265,10 +265,10 @@ CREATE TABLE IF NOT EXISTS documents (
         con.execute("CREATE SEQUENCE seq_lexicon START 1")
         con.execute("""
 CREATE TABLE IF NOT EXISTS lexicon (
-																word_id INTEGER PRIMARY KEY DEFAULT nextval('seq_lexicon'),
+	word_id INTEGER PRIMARY KEY DEFAULT nextval('seq_lexicon'),
 
-																word VARCHAR UNIQUE NOT NULL,
-																collection_frequency INTEGER NOT NULL
+	word VARCHAR UNIQUE NOT NULL,
+	collection_frequency INTEGER NOT NULL
 )
 """)
 
@@ -276,15 +276,15 @@ CREATE TABLE IF NOT EXISTS lexicon (
         con.execute("CREATE SEQUENCE seq_postings START 1")
         con.execute("""
 CREATE TABLE IF NOT EXISTS postings (
-																posting_id INTEGER PRIMARY KEY DEFAULT nextval('seq_postings'),
+	posting_id INTEGER PRIMARY KEY DEFAULT nextval('seq_postings'),
 
-																lexicon_id INTEGER NOT NULL,
-																document_id INTEGER NOT NULL,
-																word_frequency_within_document INTEGER NOT NULL,
+	lexicon_id INTEGER NOT NULL,
+	document_id INTEGER NOT NULL,
+	word_frequency_within_document INTEGER NOT NULL,
 
-																FOREIGN KEY (lexicon_id) REFERENCES lexicon(word_id),
-																FOREIGN KEY (document_id) REFERENCES documents(document_id),
-																UNIQUE(lexicon_id, document_id)
+	FOREIGN KEY (lexicon_id) REFERENCES lexicon(word_id),
+	FOREIGN KEY (document_id) REFERENCES documents(document_id),
+	UNIQUE(lexicon_id, document_id)
 )
 """)
 
@@ -348,11 +348,11 @@ VALUES (?, ?)
         con.executemany(
             """
 INSERT INTO postings (lexicon_id, document_id, word_frequency_within_document)
-																VALUES (
-																																(SELECT word_id FROM lexicon WHERE word = ?),
-																																(SELECT document_id FROM documents WHERE collection_name = ? AND index = ?),
-																																?
-																)
+VALUES (
+	(SELECT word_id FROM lexicon WHERE word = ?),
+	(SELECT document_id FROM documents WHERE collection_name = ? AND index = ?),
+	?
+)
 """,
             postings_data
         )
@@ -428,7 +428,7 @@ INSERT INTO postings (lexicon_id, document_id, word_frequency_within_document)
 SELECT COUNT(*) 
 FROM postings 
 WHERE lexicon_id = (SELECT word_id FROM lexicon WHERE word = ?)
-																																																																""", [word]).fetchone()
+""", [word]).fetchone()
 
         freq = result[0] if result else 0
         return freq
@@ -440,7 +440,7 @@ FROM lexicon l
 JOIN postings p ON l.word_id = p.lexicon_id
 JOIN documents d ON p.document_id = d.document_id
 WHERE l.word = ?
-																																																""", [word]).fetchall()
+""", [word]).fetchall()
 
         return [DocumentInfoDTO(
                 collection_name=r[0], index=r[1], word_frequency_within_document=r[2], words_length=r[3]) for r in results]

@@ -62,8 +62,10 @@ class BM25():
         for coll_name in collection_names_indexes:
             collection: list[Document] = self.indexer.read_collection_by_name(
                 coll_name)
+
+            # we should index only matched document with its respective collection
             for i, indx in enumerate(indexes):
-                if indx[0][1] < len(collection):
+                if indx[0][0] == coll_name and indx[0][1] < len(collection):
                     documents[i] = collection[indx[0][1]]
         LOGGER.ok("Documents loaded from disk")
         return documents
@@ -87,7 +89,6 @@ class BM25():
         # dictionary is (collection_name, index) -> score
         LOGGER.info("Computing words scores...")
 
-        LOGGER.info(f"words\n\n{query_words}")
         # dict is (collection name, index -> score)
         docs_scores: dict[tuple[str, int], int] = {}
         for word in query_words:
@@ -102,7 +103,6 @@ class BM25():
                     docs_scores[key] += score
                 else:
                     docs_scores[key] = score
-        LOGGER.ok("Words scores computed")
 
         if len(docs_scores) == 0:
             LOGGER.warn("No documents scores")
@@ -120,11 +120,12 @@ class BM25():
         for doc, score in docs_scores.items():
             if len(matches) == 0:
                 matches.append((doc, score))
+                continue
 
             for i in range(len(matches)):
                 if matches[i][1] > score:
                     # append and break if it is the last and not yet at capacity
-                    if len(matches) < number_returned_documents:
+                    if len(matches) - 1 == i and len(matches) < number_returned_documents:
                         matches.append((doc, score))
                         break
                     continue
@@ -142,8 +143,6 @@ class BM25():
                 if len(matches) < number_returned_documents:
                     matches.append(tmp)
                 break
-
-        LOGGER.info(f"matched scores\n\n{matches}")
 
         # return best from disk given collection name and index
         LOGGER.ok(

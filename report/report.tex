@@ -90,6 +90,13 @@ Briefly, I count different frequencies, then build the inverted index with lexic
 % calculations ar simple to make, but architecure of the system and performances are very hard -> talk about the implementation architecture, pros, cons and improvements
 % very inconsisten: gta returns correctly, grand theft auto does not
 % very inconsistent results, for: dark knight why is Emely is Away returned?
+% what is very strange is that when we search for dark knight it has no words inside that are either dark or knight, and i kept getting an errror of index out of bounds
+% when retrieveing games, moreover when I search the last game is retuned twice, the fact is that I think that the retieval is not completely corrext, I have a bug
+% looking at the code it is correct: we get fetch multiple times over different collection by different collection's indexes
+% works great: then we actually want do discourage very low words collection
+% urls need greater care because there can be multiple ones for a single item: "url": "https://store.steampowered.com/app/3014320/OCTOPATH_TRAVELER_0/?snr=1_4_4__145_1" and  "url": "https://store.steampowered.com/app/3014320/OCTOPATH_TRAVELER_0/?snr=1_4_4__145_3"
+% change we should implement on the scraper
+% we do manual cleaning
 
 At the moment, we can build and retrieve documents.
 Yet, building the indexer is not very efficient and the precision of the current algorithm is questionable.

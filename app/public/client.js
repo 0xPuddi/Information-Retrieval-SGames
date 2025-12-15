@@ -72,6 +72,10 @@ async function search(event) {
 			container.innerHTML = html;
 			// highlight
 			highlightWords(query);
+
+			// check challenges
+			checkFlappyBirdChallenge(query);
+			checkFreeSearchChallenge(query);
 		} catch (err) {
 			console.error(err);
 			alert('Error fetching data.');

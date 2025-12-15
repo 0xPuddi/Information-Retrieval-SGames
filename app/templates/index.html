@@ -35,6 +35,10 @@
 			defer
 			src="{{ url_for('static', filename='highlight.js') }}"
 		></script>
+		<script
+			defer
+			src="{{ url_for('static', filename='challenge.js') }}"
+		></script>
 
 		<!-- Used in image card -->
 		<script>
@@ -43,9 +47,9 @@
 		</script>
 	</head>
 
-	<body class="bg-gray-100 py-14 px-2 flex items-center justify-center">
+	<body class="bg-gray-100! py-14 px-2 flex items-center justify-center">
 		<div
-			class="w-screen min-h-screen px-4 lg:max-w-8/12 flex flex-col items-center justify-start gap-10"
+			class="w-screen min-h-screen px-4 lg:max-w-8/12 flex flex-col items-center justify-start gap-10 bg-gray-100!"
 		>
 			<div
 				class="flex items-center justify-start gap-5 w-full sticky top-5 z-10"
@@ -162,6 +166,62 @@
 						class="flex flex-wrap flex-row justify-start items-center w-full gap-4"
 						id="tagContainer"
 					></div>
+				</div>
+
+				<div class="flex items-center justify-center gap-5">
+					<div
+						id="flappy-bird-challenge-container"
+						class="w-12 h-12 not-completed relative"
+					>
+						<img
+							src="{{ url_for('static', filename='ui/flappy-bird.jpg') }}"
+							alt="Flappy bird challenge"
+							class="w-full h-full object-cover"
+						/>
+
+						<div
+							id="flappy-bird-icon"
+							class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
+						>
+							<img
+								src="{{ url_for('static', filename='ui/question-mark.svg') }}"
+								alt="Free search challenge"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+					</div>
+
+					<div
+						id="free-search-challenge-container"
+						class="w-12 h-12 not-completed relative"
+					>
+						<img
+							src="{{ url_for('static', filename='ui/free-search.svg') }}"
+							alt="Free search challenge"
+							class="w-full h-full object-cover"
+						/>
+
+						<div
+							id="free-search-icon"
+							class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
+						>
+							<img
+								src="{{ url_for('static', filename='ui/question-mark.svg') }}"
+								alt="Free search challenge"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+					</div>
+
+					<div id="feedback-button-container" class="hidden">
+						<a href="/feedback">
+							<button
+								class="text-white click py-2 px-4 rounded-sm bg-blue-900 hover:bg-blue-400 cursor-pointer transition-all shadow-md flex items-center justify-center"
+							>
+								Give Feedback
+							</button>
+						</a>
+					</div>
 				</div>
 			</div>
 

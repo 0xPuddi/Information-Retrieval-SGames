@@ -24,6 +24,13 @@
 	@apply bg-yellow-200 text-black;
 }
 
+.not-completed {
+	@apply border-2 border-blue-500;
+}
+.completed {
+	@apply border-2 border-green-500;
+}
+
 @theme {
 	--color-primary-blue: #1c398e;
 }

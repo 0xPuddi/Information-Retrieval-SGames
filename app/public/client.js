@@ -84,6 +84,9 @@ async function search(event) {
 
 			// check challenges
 			checkFlappyBirdChallenge(query);
+			checkAlbionOnlineChallenge(query, category);
+			checkOrganizedTheftChallenge(query, platform, status);
+			checkEldenRingChallenge(query, Array.from(tags));
 			checkFreeSearchChallenge(query);
 		} catch (err) {
 			console.error(err);

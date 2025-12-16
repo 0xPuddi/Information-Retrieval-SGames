@@ -206,16 +206,27 @@
 					</div>
 
 					<div id="feedback-label-container">
-						<p class="text-black">Look for flappy bird!</p>
+						<p data-custom-tag="flappy-bird" class="text-black">
+							Look for flappy bird!
+						</p>
 					</div>
+
+					<div id="skip-button-container" class="hidden">
+						<button
+							onclick="skipchallenge()"
+							class="text-white click py-2 px-4 rounded-sm bg-red-900 hover:bg-red-400 cursor-pointer transition-all shadow-md flex items-center justify-center"
+						>
+							Skip Challenge
+						</button>
+					</div>
+
 					<div id="feedback-button-container" class="hidden">
-						<a href="/feedback">
-							<button
-								class="text-white click py-2 px-4 rounded-sm bg-blue-900 hover:bg-blue-400 cursor-pointer transition-all shadow-md flex items-center justify-center"
-							>
-								Give Feedback
-							</button>
-						</a>
+						<button
+							onclick="moveToFeedback()"
+							class="text-white click py-2 px-4 rounded-sm bg-blue-900 hover:bg-blue-400 cursor-pointer transition-all shadow-md flex items-center justify-center"
+						>
+							Give Feedback
+						</button>
 					</div>
 				</div>
 			</div>

@@ -11,6 +11,32 @@ async function getFormDataAndSubmit() {
 	const usabilityFormData = new FormData(usabilityForm);
 	const usabilityFormJson = Object.fromEntries(usabilityFormData.entries());
 
+	// radius for tasks
+	const flappyBirdStatus = usabilityForm.querySelector(
+		'input[name="task_flappy_bird_completed"]:checked',
+	)?.value;
+	usabilityFormJson['task_flappy_bird_completed'] = flappyBirdStatus;
+
+	const albionOnlineStatus = usabilityForm.querySelector(
+		'input[name="task_albion_online_completed"]:checked',
+	)?.value;
+	usabilityFormJson['task_albion_online_completed'] = albionOnlineStatus;
+
+	const organizedTheftStatus = usabilityForm.querySelector(
+		'input[name="task_organized_theft_completed"]:checked',
+	)?.value;
+	usabilityFormJson['task_organized_theft_completed'] = organizedTheftStatus;
+
+	const eldenRingStatus = usabilityForm.querySelector(
+		'input[name="task_elden_ring_completed"]:checked',
+	)?.value;
+	usabilityFormJson['task_elden_ring_completed'] = eldenRingStatus;
+
+	const freeSearchStatus = usabilityForm.querySelector(
+		'input[name="task_free_search_completed"]:checked',
+	)?.value;
+	usabilityFormJson['task_free_search_completed'] = freeSearchStatus;
+
 	// from clinet.js
 	let success = await submitFeedback({
 		...ueFormJson,

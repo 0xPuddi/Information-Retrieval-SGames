@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SGames - Statistics</title>
+
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-white.svg') }}"
+			media="(prefers-color-scheme: light)"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-dark.svg') }}"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='gameboy-white.svg') }}"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='output.css') }}"
+		/>
+	</head>
+
+	<body class="bg-gray-100 py-10 px-2 flex items-center justify-center pb-10">
+		<div
+			class="w-screen min-h-screen px-4 lg:max-w-10/12 flex flex-col items-center justify-start gap-10"
+		>
+			<div class="text-center">
+				<h1 class="text-4xl font-bold mb-2">Feedback Analytics</h1>
+				<p class="text-gray-500">
+					Overview of user performance and sentiment
+				</p>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+				<div
+					class="bg-white rounded-3xl shadow-md p-8 flex flex-col items-center justify-center gap-4"
+				>
+					<h2 class="text-xl font-semibold text-gray-700">
+						Average SUS Score
+					</h2>
+					<div class="relative flex items-center justify-center">
+						<span class="text-6xl font-bold text-blue-600">
+							{{ avg_sus_score | round(1) }}
+						</span>
+						<span class="text-2xl text-gray-400 font-medium ml-2"
+							>/ 100</span
+						>
+					</div>
+					<p class="text-sm text-gray-500 text-center">
+						Based on {{ users_feedbacks|length }} user responses
+					</p>
+				</div>
+
+				<div
+					class="bg-white rounded-3xl shadow-md p-8 flex flex-col justify-center gap-4"
+				>
+					<h2 class="text-xl font-semibold text-gray-700">
+						Likelihood to Recommend
+					</h2>
+					<div class="flex flex-col gap-2">
+						<div class="flex justify-between items-end">
+							<span class="text-4xl font-bold text-blue-600"
+								>{{ avg_likely_to_suggest | round(1) }}</span
+							>
+							<span class="text-gray-400 pb-1">out of 10</span>
+						</div>
+						<div
+							class="w-full bg-gray-200 rounded-full h-4 overflow-hidden"
+						>
+							<div
+								class="bg-blue-500 h-full rounded-full transition-all duration-500"
+								style="width: {{ (avg_likely_to_suggest * 10) }}%"
+							></div>
+						</div>
+						<div class="flex justify-between text-xs text-gray-400">
+							<span>Not Likely</span>
+							<span>Extremely Likely</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-8 gap-6"
+			>
+				<h2 class="text-2xl font-semibold border-b pb-4">
+					User Experience
+				</h2>
+
+				<div class="flex flex-col gap-6">
+					<div
+						class="grid grid-cols-12 text-center text-xs text-gray-400 font-medium px-4"
+					>
+						<div class="col-span-3 text-left"></div>
+						<div class="col-span-6 flex justify-between px-2">
+							<span>1</span><span>4</span><span>7</span>
+						</div>
+						<div class="col-span-3 text-right"></div>
+					</div>
+
+					{% for i in range(ue_questions|length) %} {% set left_label
+					= ue_questions[i][0] %} {% set right_label =
+					ue_questions[i][1] %} {% set score = avg_ue_scores[i] %} {%
+					set pct = ((score - 1) / 6 * 100) %}
+
+					<div
+						class="grid grid-cols-12 items-center gap-4 text-sm hover:bg-gray-50 p-2 rounded transition"
+					>
+						<div
+							class="col-span-3 text-right font-medium text-gray-600"
+						>
+							{{ left_label }}
+						</div>
+
+						<div class="col-span-6 relative h-8 flex items-center">
+							<div class="w-full h-1 bg-gray-200 rounded"></div>
+							<div
+								class="absolute w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow transform -translate-x-1/2"
+								style="left: {{ pct }}%"
+							></div>
+							<div
+								class="absolute -top-4 transform -translate-x-1/2 text-xs font-bold text-blue-600"
+								style="left: {{ pct }}%"
+							>
+								{{ score|round(1) }}
+							</div>
+						</div>
+
+						<div
+							class="col-span-3 text-left font-medium text-gray-600"
+						>
+							{{ right_label }}
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-8 gap-6"
+			>
+				<h2 class="text-2xl font-semibold border-b pb-4">
+					System Usability Scale
+				</h2>
+				<div class="grid grid-cols-1 gap-6">
+					{% for i in range(sus_questions|length) %}
+					<div class="flex flex-col gap-2">
+						<div class="flex justify-between items-end">
+							<span class="text-sm text-gray-700 font-medium"
+								>{{ sus_questions[i] }}</span
+							>
+							<span class="text-sm font-bold text-blue-600"
+								>{{ avg_sus_scores[i] | round(1) }} / 5</span
+							>
+						</div>
+						<div
+							class="w-full bg-gray-100 rounded-full h-2 overflow-hidden"
+						>
+							<div
+								class="bg-blue-400 h-full rounded-full"
+								style="width: {{ (avg_sus_scores[i] / 5 * 100) }}%"
+							></div>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-8 gap-6"
+			>
+				<h2 class="text-2xl font-semibold border-b pb-4">
+					Task Analysis
+				</h2>
+
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+					{% for i in range(tasks|length) %}
+					<div
+						class="border rounded-xl p-6 flex flex-col gap-4 bg-gray-50"
+					>
+						<div class="flex justify-between items-start">
+							<h3 class="font-bold text-lg text-gray-800">
+								{{ tasks[i] }}
+							</h3>
+							<div class="flex flex-col items-end">
+								<span
+									class="text-xs text-gray-500 uppercase font-bold tracking-wider"
+									>Success Rate</span
+								>
+								<span
+									class="text-2xl font-bold {{ 'text-green-500' if avg_successes[i] > 0.7 else 'text-orange-500' }}"
+								>
+									{{ (avg_successes[i] * 100) | round | int
+									}}%
+								</span>
+							</div>
+						</div>
+
+						<div class="flex flex-col gap-2 mt-2">
+							<h4
+								class="text-xs font-bold text-gray-400 uppercase"
+							>
+								User Observations
+							</h4>
+							<div
+								class="max-h-40 overflow-y-auto pr-2 space-y-2 custom-scrollbar"
+							>
+								{% set obs_list = tasks_observations[i] %} {%
+								set has_obs = false %} {% for obs in obs_list %}
+								{% if obs %} {% set has_obs = true %}
+								<div
+									class="text-sm bg-white p-2 rounded border border-gray-200 text-gray-600 italic"
+								>
+									"{{ obs }}"
+								</div>
+								{% endif %} {% endfor %} {% if not has_obs %}
+								<span class="text-sm text-gray-400"
+									>No observations recorded.</span
+								>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<div
+				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-8 gap-6"
+			>
+				<h2 class="text-2xl font-semibold border-b pb-4">
+					Qualitative Feedback
+				</h2>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+					<div class="flex flex-col gap-3">
+						<h3
+							class="font-semibold text-green-600 flex items-center gap-2"
+						>
+							Favorite Aspects
+						</h3>
+						<div class="flex flex-col gap-2">
+							{% for item in favorite_thing_responses %} {% if
+							item %}
+							<div
+								class="bg-green-50 p-3 rounded-lg border border-green-100 text-sm text-gray-700"
+							>
+								{{ item }}
+							</div>
+							{% endif %} {% endfor %}
+						</div>
+					</div>
+
+					<div class="flex flex-col gap-3">
+						<h3
+							class="font-semibold text-red-600 flex items-center gap-2"
+						>
+							Paint Points
+						</h3>
+						<div class="flex flex-col gap-2">
+							{% for item in least_favorite_thing_responses %} {%
+							if item %}
+							<div
+								class="bg-red-50 p-3 rounded-lg border border-red-100 text-sm text-gray-700"
+							>
+								{{ item }}
+							</div>
+							{% endif %} {% endfor %}
+						</div>
+					</div>
+
+					<div class="flex flex-col gap-3">
+						<h3
+							class="font-semibold text-blue-600 flex items-center gap-2"
+						>
+							Recommendations
+						</h3>
+						<div class="flex flex-col gap-2">
+							{% for item in recommendation_responses %} {% if
+							item %}
+							<div
+								class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-gray-700"
+							>
+								{{ item }}
+							</div>
+							{% endif %} {% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

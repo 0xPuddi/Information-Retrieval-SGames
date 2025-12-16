@@ -45,12 +45,16 @@
 				class="w-full px-10 rounded-3xl shadow-md flex flex-col bg-white py-6 gap-6"
 			>
 				<h2 class="text-2xl font-semibold">User Experience</h2>
-				{% set questions = [ ('annoying_vs_enjoyable', 'Annoying',
+				{% set ue_questions = [ ('annoying_vs_enjoyable', 'Annoying',
 				'Enjoyable'), ('not_understandable_vs_understandable', 'Not
-				Understandable', 'Understandable'), ('unpleasant_vs_pleasant',
-				'Unpleasant', 'Pleasant'), ('friendly_vs_unfriendly',
-				'Unfriendly', 'Friendly'), ('clear_vs_confusing', 'Confusing',
-				'Clear') ] %}
+				Understandable', 'Understandable'),
+				('easy_to_learn_vs_difficult_to_learn', 'Easy To Learn',
+				'Difficult To Learn'), ('unpredictable_vs_predictable',
+				'Unpredictable', 'Predictable'), ('unpleasant_vs_pleasant',
+				'Unpleasant', 'Pleasant'), ('clear_vs_confusing', 'Clear',
+				'Confusing'), ('organized_vs_cluttered', 'Organized',
+				'Cluttered'), ('friendly_vs_unfriendly', 'Friendly',
+				'Unfriendly') ] %}
 
 				<form id="ue-form" class="flex flex-col gap-8 p-4">
 					<div
@@ -65,7 +69,7 @@
 						<div class="col-span-1 text-right"></div>
 					</div>
 
-					{% for id, left, right in questions %}
+					{% for id, left, right in ue_questions %}
 					<div
 						class="grid grid-cols-9 items-center text-sm text-gray-700"
 					>
@@ -102,15 +106,25 @@
 			>
 				<h2 class="text-2xl font-semibold">System Usability Scale</h2>
 
-				{% set questions = [ { 'id': 'use_frequently_question', 'text':
-				'I think I would like to use this tool frequently.' }, { 'id':
-				'unnecessary_complexity_question', 'text': 'I found the tool
-				unnecessarily complex.' }, { 'id':
+				{% set sus_questions = [ { 'id': 'use_frequently_question',
+				'text': 'I think I would like to use this tool frequently.' }, {
+				'id': 'unnecessary_complexity_question', 'text': 'I found the
+				tool unnecessarily complex.' }, { 'id': 'easy_to_use_question',
+				'text': 'I thought the tool was easy to use.' }, { 'id':
+				'technical_support_question', 'text': 'I think that I would need
+				the support of a technical person to be able to use this
+				system.' }, { 'id': 'functions_worked_well_question', 'text': 'I
+				found the various functions in this tool worked well together'
+				}, { 'id': 'inconsitency_in_tool_question', 'text': 'I thought
+				there was too much inconsistency in this tool' }, { 'id':
 				'most_people_learn_quickly_question', 'text': 'I would imagine
 				that most people would learn to use this tool very quickly.' },
-				{ 'id': 'felt_confident_question', 'text': 'I felt very
-				confident using the tool.' }, ] %} {% set scale_5 = range(1, 6)
-				%}
+				{ 'id': 'difficult_to_use_question', 'text': 'I found the tool
+				very difficult to use' }, { 'id': 'felt_confident_question',
+				'text': 'I felt very confident using the tool.' }, { 'id':
+				'need_to_learn_a_lot_question', 'text': 'I needed to learn a lot
+				of things before I could get going with this tool' }, ] %} {%
+				set scale_5 = range(1, 6) %}
 
 				<form
 					method="POST"
@@ -132,7 +146,7 @@
 						<div>Strongly Agree</div>
 					</div>
 
-					{% for q in questions %}
+					{% for q in sus_questions %}
 					<div class="grid grid-cols-6 items-center gap-2">
 						<p class="col-span-1 text-sm text-gray-800">
 							{{ q.text }}
@@ -229,68 +243,82 @@
 					<div class="flex flex-col gap-4 mt-6">
 						<h3 class="text-xl font-semibold">Search Questions</h3>
 
+						{% for q in questions %}
 						<div class="flex items-center gap-4">
-							<p class="flex-1">Task: Flappy Bird</p>
+							<p class="flex-1">Task: {{ q.name }}</p>
 							<div class="flex gap-2 items-center">
 								<label class="flex items-center gap-1"
 									><input
 										type="radio"
-										name="task_flappy_bird_completed"
+										name="{{ q.id }}_completed"
 										value="true"
 										class="accent-blue-500"
+										{%
+										if
+										q.success
+										is
+										true
+										%}checked{%
+										endif
+										%}
+										{%
+										if
+										q.success
+										is
+										true
+										or
+										q.success
+										is
+										false
+										%}disabled{%
+										endif
+										%}
 									/>
 									Completed</label
 								>
 								<label class="flex items-center gap-1"
 									><input
 										type="radio"
-										name="task_flappy_bird_completed"
+										name="{{ q.id }}_completed"
 										value="false"
 										class="accent-blue-500"
+										{%
+										if
+										q.success
+										is
+										false
+										%}checked{%
+										endif
+										%}
+										{%
+										if
+										q.success
+										is
+										true
+										or
+										q.success
+										is
+										false
+										%}disabled{%
+										endif
+										%}
 									/>
 									Failed</label
 								>
 							</div>
 						</div>
 						<textarea
-							id="task_flappy_bird_observations"
-							name="task_flappy_bird_observations"
+							id="{{ q.id }}_observations"
+							name="{{ q.id }}_observations"
 							class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-							placeholder="Observations"
+							placeholder="Observations for {{ q.name }} task"
 						></textarea>
-
-						<div class="flex items-center gap-4">
-							<p class="flex-1">Task: Free Search</p>
-							<div class="flex gap-2 items-center">
-								<label class="flex items-center gap-1"
-									><input
-										type="radio"
-										name="task_free_search_completed"
-										value="true"
-										class="accent-blue-500"
-									/>
-									Completed</label
-								>
-								<label class="flex items-center gap-1"
-									><input
-										type="radio"
-										name="task_free_search_completed"
-										value="false"
-										class="accent-blue-500"
-									/>
-									Failed</label
-								>
-							</div>
-						</div>
-						<textarea
-							id="task_free_search_observations"
-							name="task_free_search_observations"
-							class="w-full border-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-							placeholder="Observations"
-						></textarea>
+						{% endfor %}
 					</div>
 				</form>
 			</div>
+
+			<div id="feedback_message"></div>
 
 			<button
 				type="button"
@@ -299,8 +327,6 @@
 			>
 				Submit Feedback
 			</button>
-
-			<div id="feedback_message"></div>
 		</div>
 	</body>
 </html>

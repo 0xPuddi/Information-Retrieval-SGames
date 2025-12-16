@@ -170,115 +170,39 @@
 
 				<div class="flex items-center justify-center gap-5 flex-col">
 					<div class="flex items-center justify-center gap-5">
+						{% set challenges = [ 'flappy-bird', 'albion-online',
+						'organized-theft', 'elden-ring', 'free-search' ] %} {%
+						for c in challenges %}
 						<div
-							id="flappy-bird-challenge-container"
-							class="w-12 h-12 not-completed relative"
+							id="{{ c }}-challenge-container"
+							class="w-16 h-16 not-completed relative"
 						>
+							{% if c == 'free-search' %}
 							<img
-								src="{{ url_for('static', filename='ui/flappy-bird.jpg') }}"
-								alt="Flappy bird challenge"
+								src="{{ url_for('static', filename='ui/' ~ c ~ '.svg') }}"
+								alt="{{ c }} challenge"
 								class="w-full h-full object-cover"
 							/>
+							{% else %}
+							<img
+								src="{{ url_for('static', filename='ui/' ~ c ~ '.jpg') }}"
+								alt="{{ c }} challenge"
+								class="w-full h-full object-cover"
+							/>
+							{% endif %}
 
 							<div
-								id="flappy-bird-icon"
+								id="{{ c }}-icon"
 								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
 							>
 								<img
 									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
-									alt="Flappy Bird challenge status"
+									alt="{{ c }} challenge status"
 									class="w-full h-full object-cover"
 								/>
 							</div>
 						</div>
-
-						<div
-							id="albion-online-challenge-container"
-							class="w-12 h-12 not-completed relative"
-						>
-							<img
-								src="{{ url_for('static', filename='ui/albion-online.jpg') }}"
-								alt="Albion Online challenge"
-								class="w-full h-full object-cover"
-							/>
-
-							<div
-								id="albion-online-icon"
-								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
-							>
-								<img
-									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
-									alt="Albion Online challenge status"
-									class="w-full h-full object-cover"
-								/>
-							</div>
-						</div>
-
-						<div
-							id="organized-theft-challenge-container"
-							class="w-12 h-12 not-completed relative"
-						>
-							<img
-								src="{{ url_for('static', filename='ui/organized-theft.jpg') }}"
-								alt="Flappy bird challenge"
-								class="w-full h-full object-cover"
-							/>
-
-							<div
-								id="organized-theft-icon"
-								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
-							>
-								<img
-									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
-									alt="Organized theft challenge status"
-									class="w-full h-full object-cover"
-								/>
-							</div>
-						</div>
-
-						<div
-							id="elden-ring-challenge-container"
-							class="w-12 h-12 not-completed relative"
-						>
-							<img
-								src="{{ url_for('static', filename='ui/elden-ring.jpg') }}"
-								alt="Elden ring challenge"
-								class="w-full h-full object-cover"
-							/>
-
-							<div
-								id="elden-ring-icon"
-								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
-							>
-								<img
-									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
-									alt="Elden ring challenge status"
-									class="w-full h-full object-cover"
-								/>
-							</div>
-						</div>
-
-						<div
-							id="free-search-challenge-container"
-							class="w-12 h-12 not-completed relative"
-						>
-							<img
-								src="{{ url_for('static', filename='ui/free-search.svg') }}"
-								alt="Free search challenge"
-								class="w-full h-full object-cover"
-							/>
-
-							<div
-								id="free-search-icon"
-								class="w-3 h-3 absolute -bottom-1 -right-1 bg-white rounded-full"
-							>
-								<img
-									src="{{ url_for('static', filename='ui/question-mark.svg') }}"
-									alt="Free search challenge"
-									class="w-full h-full object-cover"
-								/>
-							</div>
-						</div>
+						{% endfor %}
 					</div>
 
 					<div id="feedback-label-container">

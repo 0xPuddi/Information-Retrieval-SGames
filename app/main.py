@@ -252,7 +252,7 @@ def get_feedbacks():
     ]
 
     return render_template('statistics.html',
-                           users_feedbacks=items,  # necessary?
+                           users_feedbacks_quantity=len(items),
                            #
                            ue_questions=ue_questions,
                            avg_ue_scores=avg_ue_scores,

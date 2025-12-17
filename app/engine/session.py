@@ -19,7 +19,7 @@ class UserFeedback(BaseModel):
     unpleasant_vs_pleasant: Optional[int] = Field(None, ge=1, le=7)
     clear_vs_confusing: Optional[int] = Field(None, ge=1, le=7)
     organized_vs_cluttered: Optional[int] = Field(None, ge=1, le=7)
-    friendly_vs_unfriendly: Optional[int] = Field(None, ge=-1, le=7)
+    friendly_vs_unfriendly: Optional[int] = Field(None, ge=1, le=7)
 
     # SUS
     use_frequently_question: Optional[int] = Field(None, ge=1, le=5)
@@ -246,9 +246,9 @@ task_free_search_observations TEXT
 
         for i in range(len(scores)):
             if i % 2 == 0:
-                sus_score += scores[i] - 1
+                sus_score += (0 if scores[i] == None else scores[i]) - 1
             else:
-                sus_score += 5 - scores[i]
+                sus_score += 5 - (0 if scores[i] == None else scores[i])
 
         sus_score *= 2.5
         return sus_score
@@ -269,66 +269,38 @@ task_free_search_observations TEXT
 
         # reduce
         for i in range(len(items) - 1, 0, -1):
-            scores[0][0] += scores[i][0]
-            scores[0][1] += scores[i][1]
-            scores[0][2] += scores[i][2]
-            scores[0][3] += scores[i][3]
-            scores[0][4] += scores[i][4]
-            scores[0][5] += scores[i][5]
-            scores[0][6] += scores[i][6]
-            scores[0][7] += scores[i][7]
+            for j in range(8):
+                scores[0][j] += 0 if scores[i][j] == None else scores[i][j]
 
         # divide
         return [
-            scores[0][0] / len(items),
-            scores[0][1] / len(items),
-            scores[0][2] / len(items),
-            scores[0][3] / len(items),
-            scores[0][4] / len(items),
-            scores[0][5] / len(items),
-            scores[0][6] / len(items),
-            scores[0][7] / len(items),
+            scores[0][i] / len(items) for i in range(8)
         ]
 
     def compute_avg_sus_scores(self, items: list[UserFeedback]):
         scores = [
-            [item.use_frequently_question,
-             item.unnecessary_complexity_question,
-             item.easy_to_use_question,
-             item.technical_support_question,
-             item.functions_worked_well_question,
-             item.inconsitency_in_tool_question,
-             item.most_people_learn_quickly_question,
-             item.difficult_to_use_question,
-             item.felt_confident_question,
-             item.need_to_learn_a_lot_question] for item in items
+            [
+                item.use_frequently_question,
+                item.unnecessary_complexity_question,
+                item.easy_to_use_question,
+                item.technical_support_question,
+                item.functions_worked_well_question,
+                item.inconsitency_in_tool_question,
+                item.most_people_learn_quickly_question,
+                item.difficult_to_use_question,
+                item.felt_confident_question,
+                item.need_to_learn_a_lot_question
+            ] for item in items
         ]
 
         # reduce
         for i in range(len(items) - 1, 0, -1):
-            scores[0][0] += scores[i][0]
-            scores[0][1] += scores[i][1]
-            scores[0][2] += scores[i][2]
-            scores[0][3] += scores[i][3]
-            scores[0][4] += scores[i][4]
-            scores[0][5] += scores[i][5]
-            scores[0][6] += scores[i][6]
-            scores[0][7] += scores[i][7]
-            scores[0][8] += scores[i][8]
-            scores[0][9] += scores[i][9]
+            for j in range(10):
+                scores[0][j] += 0 if scores[i][j] == None else scores[i][j]
 
         # divide
         return [
-            scores[0][0] / len(items),
-            scores[0][1] / len(items),
-            scores[0][2] / len(items),
-            scores[0][3] / len(items),
-            scores[0][4] / len(items),
-            scores[0][5] / len(items),
-            scores[0][6] / len(items),
-            scores[0][7] / len(items),
-            scores[0][8] / len(items),
-            scores[0][9] / len(items)
+            scores[0][i] / len(items) for i in range(10)
         ]
 
     def compute_avg_likely_to_suggest(self, items: list[UserFeedback]):
@@ -351,7 +323,7 @@ task_free_search_observations TEXT
                 successes[1] += 1
             if items[i].task_organized_theft_completed:
                 successes[2] += 1
-            if items[i].task_elden_ring_observations:
+            if items[i].task_elden_ring_completed:
                 successes[3] += 1
             if items[i].task_free_search_completed:
                 successes[4] += 1

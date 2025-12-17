@@ -90,7 +90,7 @@ function checkFlappyBirdChallenge(query) {
 
 function moveFromFlappyBird() {
 	document.getElementById('feedback-label-container').innerHTML = `
-				<p data-custom-tag="${AO}" class="text-black">Look for Albion Online. Suggestion... It belongs to the "MMORPG" category.</p>
+				<p data-custom-tag="${AO}" class="text-black text-3xl">Look for <span class="text-primary-blue font-bold">Albion Online</span>. Suggestion... It belongs to the "<span class="text-primary-blue font-bold">MMORPG</span>" <span class="text-primary-blue font-bold">category</span>.</p>
 			`;
 	CHALLENGE_RETRIES = 0;
 
@@ -124,7 +124,7 @@ function checkAlbionOnlineChallenge(query, category) {
 
 function moveFromAlbionOnline() {
 	document.getElementById('feedback-label-container').innerHTML = `
-				<p data-custom-tag="${OT}" class="text-black">Look for Organized Theft. Suggestion... It is an "HTML5" game and it is yet "To Be Released".</p>
+				<p data-custom-tag="${OT}" class="text-black text-3xl">Look for <span class="text-primary-blue font-bold">Organized Theft</span>. Suggestion... It is on the "<span class="text-primary-blue font-bold">HTML5</span>" <span class="text-primary-blue font-bold">platform</span> and its <span class="text-primary-blue font-bold">fstatus</span> is yet "<span class="text-primary-blue font-bold">To Be Released</span>".</p>
 			`;
 	CHALLENGE_RETRIES = 0;
 
@@ -160,7 +160,7 @@ function checkOrganizedTheftChallenge(query, platform, status) {
 
 function moveFromOrganizedTheft() {
 	document.getElementById('feedback-label-container').innerHTML = `
-				<p data-custom-tag="${ER}" class="text-black">Look for Elden Ring. Suggestion... some of its tags are "Souls-like", "Dark Fantasy" and "Open World"</p>
+				<p data-custom-tag="${ER}" class="text-black text-3xl">Look for <span class="text-primary-blue font-bold">Elden Ring</span>. Suggestion... some of its <span class="text-primary-blue font-bold">tags</span> are "<span class="text-primary-blue font-bold">Souls-like</span>", "<span class="text-primary-blue font-bold">Dark Fantasy</span>" and "<span class="text-primary-blue font-bold">Open World</span>"</p>
 			`;
 	CHALLENGE_RETRIES = 0;
 
@@ -208,7 +208,7 @@ function checkEldenRingChallenge(query, tags) {
 
 function moveFromEldenRing() {
 	document.getElementById('feedback-label-container').innerHTML = `
-				<p class="text-black">Look for your favorite game!</p>
+				<p class="text-black text-3xl">Look for your <span class="text-primary-blue font-bold">favorite game!</span></p>
 			`;
 	CHALLENGE_RETRIES = 0;
 

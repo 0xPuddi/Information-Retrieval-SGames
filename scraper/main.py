@@ -1,6 +1,5 @@
 import asyncio
 from pathlib import Path
-import sys
 import httpx
 
 from scraper.sources.source import SourceWebsite

@@ -6,11 +6,9 @@ scrapers:
 	uv run scraper
 
 tex:
-	@mkdir -p ./report
-	@touch ./report/references.bib
-	pdflatex -output-directory=./report ./report/report.tex
-	-cd ./report && bibtex report
-	pdflatex -output-directory=./report ./report/report.tex
-	pdflatex -output-directory=./report ./report/report.tex
+	cd ./report && pdflatex report.tex
+	cd ./report && biber report
+	cd ./report && pdflatex report.tex
+	cd ./report && pdflatex report.tex
 	@mv ./report/report.pdf ./report.pdf
 	@echo "PDF generated at ./report.pdf"

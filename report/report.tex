@@ -4,22 +4,35 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
+\usepackage{xurl}
 \usepackage{hyperref}
+\usepackage{float}
 \usepackage{amsmath}
 \usepackage[
     a4paper,
     left=2cm,
     right=2cm,
-    top=1cm,
-    bottom=1cm
+    top=2cm,
+    bottom=2cm
 ]{geometry}
+
+\usepackage[
+  style=numeric,
+  backend=biber,
+  sorting=none,
+  maxbibnames=2,
+  giveninits=true
+]{biblatex}
+\DeclareFieldFormat{url}{\href{#1}{URL}}
+\addbibresource{references.bib}
+
+\graphicspath{ {./images/} }
 
 % Page layout
 \geometry{margin=1in}
 
 % Title information
-% \title{Information Retrieval Project - SGames}
-\title{Information Retrieval Project - SGames - Progress Report}
+\title{Information Retrieval Project - SGames}
 \author{}
 \date{\today}
 
@@ -27,100 +40,365 @@
 
 \maketitle
 
+\begin{abstract}
 \noindent
-You can find the implementation of the project along with the technical guide at my GitHub repository: \href{https://github.com/0xPuddi/Information-Retrieval-SGames}{Information-Retrieval-SGames}.
-I started by setting up the project using uv.
+For the Information Retrieval class I built a Retrieval System, I worked independently.
+The system implements both a Scraper and a Search Engine that, respectively,
+scrape data and parse it into documents from video games websites (Itch.io, Steam, Game Jolt) and
+index, retrieve and serve such data through a web application interface. The following document will
+expand on design choices, implementation choices, evaluation design and evaluation results.
+You can find the implementation along with the technical guide to run the entire project
+at my GitHub repository: \href{https://github.com/0xPuddi/Information-Retrieval-SGames}{Information-Retrieval-SGames}.
+\end{abstract}
 
-% \begin{abstract}
-% \noindent
-% For the Information Retrieval class I built both a Scraper and a Search Engine that, respectively,
-% scrape data and parse it into documents from video games websites (itchio, steam, gamejolt) and
-% index, retrieve and serve such data through a web application interface. The following document will
-% expand on architecture decisions and both implementation details and difficulties.
-% \end{abstract}
+\tableofcontents
+\newpage
 
-% \tableofcontents
-% \newpage
+\section{Design Choices}
 
-\section{Scraper}
+The project starts by chosing how the Scraper and the Search Engine will be structured, implemented and ultimately delivered.
+I then defined the primary components of the entire system.
+Components are: a Scraper to retrieve data from designated websites and parse them into json files, which will compose our collection.
+An Indexer that, by reading the entire collection, it will build the inverted index.
+A Ranking engine that, given a query and the inverted index, it has to calculate documents relevance and return the set of most relevant documents.
+Finally the last component will be a User Interface that will display returned most relevant documents.
 
-I started by creating a scraper with the aim to collect websites data that will be used as documents for my collection.
-The first platform I scraped is \href{https://itch.io/}{itchio}, which provides a plethora of indie games, ranging from games made in a few minutes to games that become small hits.
-Going to the website, I decided to look for the scraping policies provided by the \textit{robots.txt} file.
-% Policies allow majority of pages and any user agent. Moreover, there is a link to a sitemap. The sitemap provides an \textit{XML} file detailing all existing pages by category.
-Seeing the sitemap in the \textit{robots.txt} I decided to scrape the website a little differently, instead of going through the main page (root page) and traversing it through links on the homepage I opted to go with the sitemap, collecting all games' URLs and hitting each one with a \textit{GET} request to obtain, parse, and save the content.
-% The sitemap provides links for games pages where each one holds a great amount of links directing to games pages. We collect those links by looking whether the link has the sequence \textit{game} or \textit{game\_*}, where the asteric can be any sequence of numbers characters ($[0, 9]$) of any length.
-% Once obtained, we send a \textit{GET} request to obtain the page, which returns a list of links that redirect to games pages. We simply iterate over those and collect data for each one of them.
+We can schematize components as:
 
-To complete the project I plan to add \href{https://store.steampowered.com/}{Steam} and \href{https://gamejolt.com/games}{Gamejolt} scrapers and explain in more detail the scraper and completely cite sources that I used in the report (if I do so I will exceed 1 page).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{design-choice-schema}
+    \caption{Retrieval System Components}
+\end{figure}
 
-% Talk about decisiona bout steam: too much going on -> chose to traverse using recommended
+\noindent
+I stepped away from already implemented solutions as I really wanted to understand how such systems work.
+Given that the BM25, compared to other models, is one of the most straightforward model and has good matching performances we can implement it to succesfully complete the project.
 
-% Talk about at first I implemented scrolling traversal on gamejolt + I could not load the page because i was blocked by cloudflare
-% talk about solutions -> using playwright stealt + headful browser, and startign in the main page, to then traverse to games and get cookies after accepting form
-% once collected you can open new pages to then scrape each game as you wish
-% tell how i changed from a srollin traversal aslo to a recommended traversal for gamejolt -> less moving parts, more reliable
-% say that is it very hard to come to a nroamlized structure between different sources
-% also within the same source there are many different cases in which things are displayied in the html
-% hard to distinguish data types when they are similar category/genre
-% quite difficult to make it efficient: talk about architecture and what it could be improved
-% talk about advantages/disadvantages of collection data by moving between suggested -> very high rate of already seen titles, no control over collected elements and moving the scraper between collections and scrolling -> follows the entire catalouge but it is hardder to program and to make sure it always works "feels clunky"
+\section{Implementation Choices}
 
-\section{Search Engine}
+The implementation is the technical part where we will dive deeper, following design choices, into how those components have come to fruition, which technologies I used and how they are interconnected.
+As first implementation choice I have chosen to use Python for the entirety of the project, besides the data format, which is json and which comes from the Javascript ecosystem.
+I made this decision as it is the most simple, quick and comfortable way to work on natual language processing (NLP) projects thanks to its ecosystem of packages.
+I set up the project using the Python project manager uv \parencite{uv_documentation}.
+I will describe one component at a time.
 
-As soon as I got my first scraper running and collected some data I moved on to building the basis of my Search Engine.
-The Search engine for now has two components: A retrieval model and a web server. Both are developed using Python, where the retrieval model is made with simple libraries and a DuckDB database to hold the inverted index.
-The web server is also made in pyhton with Flask, which provides any kind of route and HTML templates.
-% We define the website through HTML pages and templates and CSS for styles.
+The system implements three simple features:
 
-The Search engine architecture is established, for the end of the project I might change aspects to ensure a better and smoother experience, explain it thoroughly and cite sources.
+\begin{itemize}
+    \item Results Presentation
+    \item Filtering
+    \item Results Snippets
+\end{itemize}
 
-\subsection{Retrieval Model}
+\subsection{Scraper}
+
+For each page we have a specific scraping routine that is tailored to the way the website handles scrapers and to the structure of the page.
+What it is common for each website is the resulting model that is then used in the Indexer, such model object \textit{Metadata} can be found in the file \textit{./collection/models/document.py}.
+Briefly, for each page we scrape: title, description, video links, image links, price, author, status, category, genre, rating, tags, platforms, published, extra\_data and text.
+Title is the name of the game, the author is the game's author, video and image links are links that can be found in the carouselle of the game.
+Status indicates in which development stage a game is in, genre the type of game it is, rating its rating and tags the topics that this game has.
+Platforms indicates on which devices you can play the game, published indicates the date the game has been published if it already reached this stage.
+Lastly, extra\_data holds all extra data that we find and do not structure.
+Text, which is the most important field, holds all text that we find relevant for the retrieval of the document, which for now collects all texts from key HTML text tags.
+On this note I wanted to add that normalizing different data sources to a common unified model is a very interesting and difficult task.
+Each website displays data as they see fit, which usually leads to very different representations for the same kind of item.
+Also the selection of types to be saved within a model is a task that requires great care and has to deal with a lot of ambiguities if not planned correctly.
+Overall the code is not extremely efficient, and this has been a problem through the whole project, as I aimed at delivering the project within time constraints I had to leave naive behaviour for each component.
+Specifically for scrapers, they check whether a game document has been already scraped by loading each time the entire collection in memory and ensure that a game with the same id is not present.
+The id is calculated by taking the hash of the string: \textit{"collection\_name-game\_url-title"}, which becomes not so useful when a website uses different URLs for the same games such as Steam.
+All common functions are held in the parent object \textit{Source}, which includes saving a new document to the file system, loading a file system collection and collecting the scraping policies file given an URL.
+Scrapers are designed to have scraping courtesy.
+
+The first platform I scraped is \href{https://itch.io/}{Itch.io}, which provides a plethora of indie games, ranging from games made in a few minutes to games that become small hits.
+While visiting the website, I decided to look for scraping policies provided by the \textit{robots.txt} file.
+Policies allow majority of pages and any user agent.
+Moreover, there is a link to a sitemap.
+The sitemap provides a \textit{XML} file detailing all existing pages by category.
+Seeing the sitemap in the \textit{robots.txt} I decided to scrape the website a little differently, instead of going through the main page and traversing it through links provided there I opted to go with the sitemap: collecting all games' URLs and hitting each one with a \textit{GET} request to obtain, parse, and save the content.
+The sitemap provides links for games pages where each one holds a great amount of links directing to each game page hosted on the platform.
+I collect those links by looking whether the link has the sequence \textit{game} or \textit{game\_*}, where the asterisk can be any sequence of numbers characters $[0, 9]$ of any length.
+Once obtained, we send a \textit{GET} request to obtain the page, which returns a list of links that redirect to each game page.
+We simply iterate over game page links and scrape data for each one of them.
+The file is named \textit{itchio.json} and can be found, if you run the scraper, within the \textit{collection} folder.
+
+We can schematize the routine as:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/itchio-scraping-architecture}
+    \caption{Itch.io Scraping Routine}
+\end{figure}
+
+\noindent
+The technologies I used to perform the Itch.io scraping are Playwright \parencite{scraper_playwright_blog_tutorial} in order to visit and scrape the XML sitemap pages and HTML game pages, Element Tree \parencite{scraper_xml_element_tree_namespace} \parencite{scraper_xml_element_tree_findall} to parse the XML sitemap pages, Parsel \parencite{parsel_usage_documentation} to parse the HTML document tree and Pydantic \parencite{pydantic_documentation} to validate the model.
+I also leveraged Python regexes \parencite{regex_documents} to parse the XML.
+
+The second platform I targeted was \href{https://store.steampowered.com/}{Steam}, which features a \textit{robots.txt} policy that is very permissive, allowing for most routes and any user agent.
+Throughout the process, the platform proved to be kind to scrapers.
+Given that one behaves reasonably, the server does not impose blocks.
+However, the scraping flow differs significantly from the Itch.io implementation.
+For Steam, I adopted a traversal strategy: I start at the main page to collect initial game links, then visit each game page to extract metadata while simultaneously harvesting links from the recommendations section.
+These new links are added to a queue, and the process iterates over those recommendations until the queue is exhausted.
+While this methodology is a very easy way to traverse websites, I observed that it frequently returns to pages I had already visited.
+After scraping a certain amount of data, it becomes increasingly difficult to discover new games through this traversal.
+
+The Steam's scraping routine is:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/steam-scraping-architecture}
+    \caption{Steam Scraping Routine}
+\end{figure}
+
+\noindent
+To perform it we used the same technologies that Itch.io used.
+
+For the third platform, \href{https://gamejolt.com/games}{Game Jolt}, I followed a routine similar to the one used for Steam.
+I begin by navigating to the main game page, specifically \textit{/games}, and collect all visible titles.
+From there, I access each game page to extract data and populate the queue with links found in the recommended games section.
+The difference of this website lies in how it handles scrapers.
+Despite its \textit{robots.txt} policies allowing scrapers to access the main and individual game pages, Cloudflare often intercepts and blocks standard requests.
+To address it, I utilize Playwright nightly with a headful browser to first open the root page of the website.
+After waiting a few seconds, I collect cookies that have been set by the web server.
+These cookies typically hold a valid session that Game Jolt can work with, allowing me to close the headful browser and proceed with the scraping routine as previously described by simply including these cookies in the requests.
+
+The Game Jolt's scraping routine is:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/gamejolt-scraping-architecture}
+    \caption{Game Jolt Scraping Routine}
+\end{figure}
+
+\noindent
+Also for this third website we used the same technologies of the previous two.
+
+Overall Steam offers documents with the most detailed fields and games that are much more curated and well designed, then it follows Game Jolt and finally Itch.io as they allow creators to publish any kind of games on their platforms.
+The created collection will then be used by the indexer.
+
+\subsection{Search Engine}
+
+As soon as I got my first scraper running and collected some data I moved on to implement the Search Engine.
+The Search Engine, as from design, has three components: An Indexer, a Retrieval model and a Web Server, which provides the User Interface (UI).
+All components are developed using Python, where the Retrieval model is made with simple libraries and a DuckDB database \parencite{sengine_duckdb_python_api} to hold the inverted index.
+The web server is also made in Python using Flask \parencite{wapp_flask_installation}, which provides a comprehensive router \parencite{wapp_flask_quickstart} capable of providing any kind of route and HTML templates through Jinja \parencite{wapp_jinja_documentation}.
+
+\subsubsection{Retrieval Model}
 
 The retrieval model is the most interesting part of the Search Engine.
-% I started by creeating a \textit{Parser} object which holds all text processing tasks.
-At this time it provides a tokenizer, stopwords removal and stemming.
-To implement those features I leveraged the simple \href{https://www.geeksforgeeks.org/python/NLTK-NLP/}{nltk} NLP processing library to remove stopwords and to stem tokens.
-Then I created the \textit{Indexer}, which is responsible for reading the collection from the \textit{/collection} folder, build the inverted index and store it in the \href{https://duckdb.org/docs/stable/clients/python/overview}{DuckDB} database.
-Briefly, I count different frequencies, then build the inverted index with lexicon, postings and a middle table to properly compute the Okapi BM25 provided by the \href{https://en.wikipedia.org/wiki/Okapi_BM25}{wikipedia reference}.
-% BM25 computatio is done in the \textit{BM25} object in the \textit{BM25.py} file. The Object relies on the \textit{Indexer} to get frequencies informations.
+I started by creating a \textit{Parser} object which holds all text processing tasks.
+At this time it provides a tokenizer, stopwords removal \parencite{sengine_gfg_kartik_stopwords} and stemming \parencite{sengine_gfg_kartik_stemming}.
+To implement stemming and stopwords removal I leveraged the simple \textit{nltk} NLP processing library.
+Then I created the \textit{Indexer}, which is responsible for reading the collection from json files in the \textit{/collection} folder, build the inverted index and store it in the DuckDB database \parencite{sengine_duckdb_python_db_api}.
+We can schematize the process as:
 
-% talk about normalization, filtering
-% talk about development challenges on how to filter
-% calculations ar simple to make, but architecure of the system and performances are very hard -> talk about the implementation architecture, pros, cons and improvements
-% very inconsisten: gta returns correctly, grand theft auto does not
-% very inconsistent results, for: dark knight why is Emely is Away returned?
-% what is very strange is that when we search for dark knight it has no words inside that are either dark or knight, and i kept getting an errror of index out of bounds
-% when retrieveing games, moreover when I search the last game is retuned twice, the fact is that I think that the retieval is not completely corrext, I have a bug
-% looking at the code it is correct: we get fetch multiple times over different collection by different collection's indexes
-% works great: then we actually want do discourage very low words collection
-% urls need greater care because there can be multiple ones for a single item: "url": "https://store.steampowered.com/app/3014320/OCTOPATH_TRAVELER_0/?snr=1_4_4__145_1" and  "url": "https://store.steampowered.com/app/3014320/OCTOPATH_TRAVELER_0/?snr=1_4_4__145_3"
-% change we should implement on the scraper
-% we do manual cleaning
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/indexer-implementation-architecture}
+    \caption{Indexer Implementation Architecture}
+\end{figure}
 
-At the moment, we can build and retrieve documents.
-Yet, building the indexer is not very efficient and the precision of the current algorithm is questionable.
-To complete the project I plan to modify both the \textit{Indexer} and the \textit{BM25} algorithm to address those two issues.
+\noindent
+We will now go over what the Indexer does, as soon as it processes all texts it starts to count frequencies.
+For each word it counts the frequency within the entire collection, and within each document that holds such word.
+In fact these two word informations are related as the collection frequency is given by the sum of all documents frequencies, which is how I infer the collection frequency.
+Given these counts we build the Lexicon for each word, which is a model holding the collection frequency and Postings.
+Postings is a model that stands in between a Lexicon and a Document entry.
+In other words a Postings is a many to many relation between Lexicon and Document rows.
+Now, we compute the inverted index in a very naive way, when counting for each word's Lexicon we create Postings entries, which are computed once and for each one we add the respective Document model.
+The Document model holds the collection name and offset index within the collection so that we can then read the json file to retrieve the document.
+Moreover, it holds all document relative needed information, such as the length of the document.
+The problem is that if we have two words that belong to the same document we have a duplicated Document model, this is inefficient and is a result of my naive implementation.
+Finally, once we computed all needed information we create the SQL queries to insert information in our database.
 
-\subsection{Web Server}
+The database is composed by three tables \parencite{sengine_duckdb_create_table} \parencite{sengine_duckdb_insert}:
 
-The web server is simple and the most underdeveloped component at this time.
-I provide two routes: a home page at \textit{/} and a query route at \textit{/query} that takes a JSON body with a \textit{query} field, which is the query to be matched.
-% The pages are simple, I define an \textit{index.html} that is the homepage and a component: \textit{card.html} which is responsible for displaying the preview of the returned documents.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/duckdb-tables}
+    \caption{Database Table Schema}
+\end{figure}
 
-I plan to expand the web server by making the Homepage clear and provided with at least a simple feature.
-Introduce questionnaires to get feedback both before using the engine and after, along with examples queries that users can make to evaluate the system.
-% Then I will also give each document a dedicated page entry displaying its information with much greater detail.
-Here too I will cite sources and explain it in greater detail.
+\noindent
+The Lexicon holds the word and the word frequency within the entire collection, the Postings holds informatio related to the tuple word and document, which in this case is the word frequency within a specific document and the Documents table holds the information related to a single document, specifically its length and information to retrieve it: collection name and offset index.
+The Postings table is the one that holds the Lexicon and the Documents entries by a many to many relation.
 
-% talk about hard to make a good user interface
-% talk about how highlight is implemented
+With these informations we can then develop the Okapi BM25 \parencite{sengine_wikipedia_okapi_bm25} ranking model.
+The model formal formulation is:
 
-% \section{Conclusion}
-%
+$$\text{score}(D, Q) = \sum_{i=1}^{n} \text{IDF}(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot \left( 1 - b + b \cdot \frac{|D|}{\text{avgdl}} \right)}$$
+$$\text{IDF}(q_i) = \ln \left( \frac{N - n(q_i) + 0.5}{n(q_i) + 0.5} + 1 \right)$$
+
+\noindent
+The computation is done in the \textit{BM25} object in the \textit{BM25.py} file. The Object relies on the \textit{Indexer} to get frequencies informations.
+Given the inverted index those information are retrieved efficiently.
+Shortly, $f(q_i, D)$ is the frequency of word $q_i$ in document $D$, found in the Lexicon.
+$|D|$ is the document length and $\text{avgdl}$ is the average length of the document, which is computed when frequencies and then stored in the Python class model, and stored in the database in a separate json that can be loaded when we run the app, preventing us to calculate it each time the app runs.
+$N$ is the total number of documents in the collection, which is treated storage wise the same way as the average document length, and $n(q_i)$ is the number of documents containing word $q_i$, which is calculated at runtime by counting how many postings entries a word has.
+
+The last step, given a query and the indexed collection, is to match the query to documents within the collection.
+The architecture is:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/ranking-implementation-architecture}
+    \caption{Ranking Architecture}
+\end{figure}
+
+\noindent
+To perform the match we leverage \textit{Indexer} functionalities.
+When we receive a query we perform parsing operations that all collection texts have been exposed to: Tokenization, Stopwords removal and Stemming.
+Once done we calculate documents scores for each word in the query.
+The computation starts by leveraging the indexer while looping over each query word.
+We collect all information needed to compute the score of each single word of the document and document indexing information.
+We store the first word score for a never seen document in a dictionary and for a seen document by summing that word score to previous words scores we have calculated before.
+At the end the sum of those word scores compute the final document score.
+We then conclude by selecting the best $x$ matches, which we default set to 30, and based on collection name and offset index we retrieve json documents and return them to the client.
+
+\subsubsection{Web Server}
+
+The last component we need to cover is the web server.
+It is built using Flask and Jinja templating to construct pages with components, render HTML pages on the server and return them to the client (browser).
+We then leverage from the Javascript ecosystem Tailwind CSS to define styles for the page with ease and Javascript to add extra logical functionality to pages.
+All pages and components can be found in the \textit{./app/templates} folder, while all styles, images and scripts that the client needs are found in the \textit{./app/public} folder.
+
+The server defines different routes.
+Both routes and high level architecture can be illustrated as:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/ui-implementation-architecture}
+    \caption{Web Server Architecture}
+\end{figure}
+
+\noindent
+Routes provided are, a home page with \textit{GET} request at path \textit{/} and a query route with \textit{POST} request at path \textit{/query} that, respectively, render the homepage that can be used to search, filter and display documents returned by the BM25 model and take a json body with a \textit{query} field, which is the query to be matched with collection documents.
+The root page is defined by the \textit{index.html} page and the model returned by the query route is the \textit{Document} model.
+Given the returned models the client then calls with a \textit{POST} request the route \textit{/render/documents} with documents json objects to render the \textit{card.html} component for each object that is then inserted and displayed in the dom.
+Each document has then a dedicated page which can be fetched by sending a \textit{GET} request to the route \textit{/document} with query parameters \textit{id} and \textit{collection}, which, respectively, hold the hashed document id and the collection name.
+The document page returned is the \textit{document.html} page.
+
+Lastly we have the feedback flow, routes and pages. This flow aims at providing users that use the system with challenges that they can perform over the collection. Once they complete or waive challenges they are asked to provide feedback about the overall system through User Experience, System Usability Scale and Usability Testing questionnaire.
+The flow will be covered in the next section in greater detail.
+Regarding the implementation we provide three routes:
+
+\begin{itemize}
+    \item \textit{/feedback}, a \textit{GET} request route that returns the \textit{feedback.html} page.
+    \item \textit{/feedback}, a \textit{POST} request route that given a json object with the \textit{feedback} field stores the relative feedback information.
+    \item \textit{/feedback/analytics}, a \textit{GET} request route that computes all necessary evaluation results and displays them by returning the \textit{statistics.html} page
+\end{itemize}
+
+I also leveraged the Tree Walker Method \parencite{mozilla_create_tree_walker_method} to develop the words highlight feature, it helped me find and traverse all text nodes \parencite{find_all_text_nodes} in our document.
+I also sought help from the vjs library \parencite{vjs} to display and render youtube video links that games provided, both in the youtube embed \parencite{video_youtube_embed} and m3u8 \parencite{videojs_play_m3u8} formats.
+
+\section{Evaluation Design}
+
+The feedback provided by users is strictly anonymous.
+The design of the evaluation differs from the regular supervised and guided evaluation that it is usually done with a supervisor and the testing user.
+I have choosen to experiment and provide the user with five diffferent challenges:
+
+\begin{itemize}
+    \item Flappy Bird: The user has to query for \textit{Flappy Bird} games documents.
+    \item Albion Online: The user has to query for \textit{Albion Online} with the \textit{MMORPG} category filter selected.
+    \item Organized Theft: The user has to query for \textit{Organized Theft} with the \textit{HTML5} platform filter and \textit{To Be Released} status filter selected.
+    \item Elden Ring: The user has to query for \textit{Elden Ring} with the \textit{Souls-like}, \textit{Dark Fantasy} and \textit{Open World} tags filter selected.
+\end{itemize}
+
+A user can complete challenges or, as soon as he hits three queries that do not completed the challenge, they get the possibility to skip the current challenge.
+I implemented the mechanism to allow for both completed and not completed to get a more clear and comprehensive view of the system.
+The user is then handed the system and he has the complete freedom to use it and no external help from the supervisor unless explicitly asked.
+I wanted to experiment with this kind of evaluation design as I supposed that by doing so the user is much more engaged, stimulated and prone to spot inconsistencies and problems of the system while performing tasks.
+You can find challenges frontend logic in the \textit{challenge.js}.
+
+Once a user reaches the last challenge, after three up to the user searches he will be shown a button that redirects him to the feedback page.
+In this page the status of previous tasks (besides the last one) is already set either as completed or not completed.
+The feedback has three questionnaires:
+
+\begin{itemize}
+    \item User Experience \parencite{user_experience_questionnaire}, in which users have to give a feedback of their experience between two contrasting terms.
+    \item System Usability Scale \parencite{usability_starter_kit}, in which users have to evaluate the overall usability of the system.
+    \item Usability Testing \parencite{usability_starter_kit}, in which users can provide their favorite aspects and pain points of the platform and provide recommendation.
+\end{itemize}
+
+\section{Evaluation Results}
+
+Results are then used to compute relevant metrics.
+The key metric is the System Usability Score.
+Out of a pool of three responses my system received an average System Usability Score of $73.3$ out of $100$:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{images/average-sus-score}
+    \caption{Average SUS Score}
+\end{figure}
+
+This implies a good usability, where users have been satisifed by the system but they still find a good room for improvements. Other interesting metrics I have calculated are, the average likelihood of a user to recommend the system:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{images/likelihood-to-recommend}
+    \caption{Average Likelihood to Recommend}
+\end{figure}
+
+\noindent
+which is interestingly tied to the average SUS score, and the user experience results:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/user-experience}
+    \caption{User Experience Results}
+\end{figure}
+
+\noindent
+which also gives interesting insights, as it points out that the major bottleneck of the system is probably both, its difficulty to learn it and its unpredictability.
+We then have very interesting favorite aspects, pain points and recommendations, to cite a few:
+
+\begin{itemize}
+    \item Favorite Aspects
+
+    \begin{itemize}
+        \item "the search engine work pretty well since the first result are not the most famous but the most relevant to the query"
+        \item "quick search and filtering feature"
+    \end{itemize}
+
+    \item Pain Points
+
+    \begin{itemize}
+        \item "my least favorite thing about this site is that if i misspelled the name of the game the site doesn't give any document back."
+        \item "confusion between search bar and tags"
+    \end{itemize}
+
+    \item Recommendations
+
+    \begin{itemize}
+        \item "update the search engine in order to show the most famous game above"
+        \item "all the texts are very small. I couldn't see the instruction."
+    \end{itemize}
+\end{itemize}
+
+\noindent
+We can collect these information to already have specific areas that the system has to improve.
+One interesting fact that I notice is that two users gave contrasting feedbacks.
+One user pointed out that it is a good aspect to have the system retrieve the most relevant documents compared to the query, while another user said that he would wish the most popular games to appear before any other queried document.
+This contrast in opinion can not be solved by changing the system to behave one way or another, but it suggests that it should be architected in such a way that the system blends with the user's belief system.
+To accomplish such a task the system would necessarily need a recommendation system or another kind of retrieval ordering and filtering that blends with the user's profile, which can be architected by using heuristics that a recommender system does.
+
+\section{Conclusion}
+
+The project has been full of learning lessons.
+It has been really interesting and fun to experiment with.
+Evaluation results provided that the system could be usable to some extent, which is a rewarding result.
+Next steps for the project could be to refine the User Interface following recommendations, increase the collection size and perfect all the backend logic as it is very naive.
+
+\section{Disclaimer}
+
+For the project I want to disclose that not all resources I used may be cited, as they have been completely lost in the vast research that I had to do.
+Nevertheless all the most important and key information I have taken great influence from have been cited.
+For the project I used LLMs to guide me through only nuances of the code and to clarify design, architecture and implementation of the system.
+The overall code structure, implementation, architecture and design has been ultimately laid down and implemented by me.
 
 % References
-% \bibliographystyle{plain}
-% \bibliography{references}
+\printbibliography
 
 \end{document}

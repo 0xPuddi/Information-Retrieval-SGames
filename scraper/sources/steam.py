@@ -308,9 +308,7 @@ class SourceSteam(SourceWebsite):
         try:
             await page.goto(self.BASE_URL,  wait_until="networkidle")
 
-            # wait for elements
-            await page.wait_for_selector('.tab_content_items', timeout=10000)
-            items = await page.query_selector_all('.tab_content_items a')
+            items = await page.query_selector_all('#tab_topsellers_content .tab_content_items a')
         except Exception as e:
             LOGGER.error(f"Could not start routine: {e}")
 

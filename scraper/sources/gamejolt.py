@@ -360,15 +360,15 @@ class SourceGamejolt(SourceWebsite):
         LOGGER.info("[SourceGamejolt.routine] starting routine")
         context = await self.browser.new_context()
         page = await context.new_page()
-        await page.goto(self.BASE_URL,  wait_until="networkidle")
+        await page.goto(self.BASE_URL,  wait_until="load")
 
         await sleep(5)
 
         LOGGER.info(
             "[SourceGamejolt.routine] Moving to store and processing games in the page")
         # we traverse to store
-        await page.click("a.navbar-item >> text=Store")
-        await page.wait_for_load_state('networkidle')
+        await page.click("a[href='/games']")
+        await page.wait_for_load_state('load')
 
         # trying to accept and collect cookies
         await sleep(1)
@@ -459,4 +459,3 @@ class SourceGamejolt(SourceWebsite):
         async with Stealth().use_async(async_playwright()) as p:
             self.browser = await p.chromium.launch(headless=False)
             await self.routine()
-            await self.browser.close()

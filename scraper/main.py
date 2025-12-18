@@ -56,7 +56,6 @@ async def _main():
             task.cancel()
         await asyncio.gather(*pending, return_exceptions=True)
         LOGGER.ok("[_main] Shutdown completed")
-    # if stopping policy is ever implemented
     LOGGER.ok("[_main] Scrapers routines completed")
 
 

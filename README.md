@@ -18,8 +18,13 @@ querying and retrieve documents within the collection.
 Here you can find the technical guide and how to run the app.
 
 For a more in depth analysis of the achitecture, decision process and results
-compile the Latex report found in `./report` using make tex then open
-`report.pdf`.
+compile the Latex of the report found in `./report` using:
+
+```sh
+make tex
+```
+
+then open `report.pdf`.
 
 ## Environment and uv
 

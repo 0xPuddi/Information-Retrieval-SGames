@@ -19,7 +19,7 @@ class SourceItch(SourceWebsite):
     browser: Browser = None
 
     # skip until this one game url is found and start fron the next one
-    last_seen = "https://kingbobski.itch.io/flappy-man"
+    last_seen = ""
 
     # Set a limit on number of entries fetched
     limit = False

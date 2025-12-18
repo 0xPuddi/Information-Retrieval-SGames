@@ -9,7 +9,7 @@ websites such as itchio, steam and gamejolt. You can also add a website of your
 choice to the scraped websites and add a scraping path to collect necessary
 informations. Before running the web app you should have some documents inside
 `/collection`. Once you collected some data you can run the search engine, which
-will use the collection provided by scrapers to create and inverted index, then
+will use the collection provided by scrapers to create an inverted index, then
 it will start the server and have ready all the necessary components for
 querying and retrieve documents within the collection.
 
